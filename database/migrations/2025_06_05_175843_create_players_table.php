@@ -21,9 +21,6 @@ return new class extends Migration
 
         });
 
-        Schema::table('players', function (Blueprint $table) {
-            $table->foreign('team_id')->references('id')->on('teams');
-        });
     }
 
     /**
