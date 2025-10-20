@@ -1,0 +1,14 @@
+{
+    "name": "Membership",
+    "alias": "membership",
+    "description": "Membership management using JobMetric package",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "JobMetric\\Membership\\MembershipServiceProvider"
+    ],
+    "aliases": {
+        "Membership": "JobMetric\\Membership\\Facades\\Membership"
+    },
+    "files": []
+}

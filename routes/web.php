@@ -3,7 +3,6 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
-use JWebb\Unleash\Unleash;
 
 // Public Routes
 Route::get('/', function () {
@@ -11,11 +10,8 @@ Route::get('/', function () {
 });
 
 // Feature-Flagged Routes
-Route::get('/tournaments', function (Unleash $unleash) {
-    if ($unleash->isEnabled('tournaments')) {
-        return view('tournaments');
-    }
-    return "Coming soon! 🚧";
+Route::get('/tournaments', function () {
+    return view('tournaments');
 });
 
 // Resource Routes
@@ -50,6 +46,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::group(['middleware' => ['role:admin']], function () {
+    Route::get('/admin/users', 'UserManagementController@index');
 });
 
 require __DIR__.'/auth.php';

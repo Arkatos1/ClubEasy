@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use jeremykenedy\LaravelRoles\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -40,6 +41,12 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        // Assign "visitor" role to new user
+        $visitorRole = Role::where('slug', 'visitor')->first();
+        if ($visitorRole) {
+            $user->attachRole($visitorRole);
+        }
 
         event(new Registered($user));
 

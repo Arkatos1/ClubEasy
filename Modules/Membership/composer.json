@@ -1,0 +1,8 @@
+{
+    "name": "nwidart/membership",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Membership\\": "./"
+        }
+    }
+}
