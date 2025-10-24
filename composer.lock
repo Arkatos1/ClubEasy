@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "24d1c624cfd1022de35d63bc35064d91",
+    "content-hash": "71c6705a58a28e7848388b8cb0bedc86",
     "packages": [
         {
             "name": "ably/ably-php",
@@ -58,6 +58,60 @@
                 "source": "https://github.com/ably/ably-php/tree/1.1.11"
             },
             "time": "2025-03-07T13:02:01+00:00"
+        },
+        {
+            "name": "bacon/bacon-qr-code",
+            "version": "v3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Bacon/BaconQrCode.git",
+                "reference": "f9cc1f52b5a463062251d666761178dbdb6b544f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Bacon/BaconQrCode/zipball/f9cc1f52b5a463062251d666761178dbdb6b544f",
+                "reference": "f9cc1f52b5a463062251d666761178dbdb6b544f",
+                "shasum": ""
+            },
+            "require": {
+                "dasprid/enum": "^1.0.3",
+                "ext-iconv": "*",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "phly/keep-a-changelog": "^2.12",
+                "phpunit/phpunit": "^10.5.11 || 11.0.4",
+                "spatie/phpunit-snapshot-assertions": "^5.1.5",
+                "squizlabs/php_codesniffer": "^3.9"
+            },
+            "suggest": {
+                "ext-imagick": "to generate QR code images"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BaconQrCode\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Scholzen 'DASPRiD'",
+                    "email": "mail@dasprids.de",
+                    "homepage": "https://dasprids.de/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "BaconQrCode is a QR code generator for PHP.",
+            "homepage": "https://github.com/Bacon/BaconQrCode",
+            "support": {
+                "issues": "https://github.com/Bacon/BaconQrCode/issues",
+                "source": "https://github.com/Bacon/BaconQrCode/tree/v3.0.1"
+            },
+            "time": "2024-10-01T13:55:55+00:00"
         },
         {
             "name": "brick/math",
@@ -187,6 +241,119 @@
                 }
             ],
             "time": "2024-02-09T16:56:22+00:00"
+        },
+        {
+            "name": "ccharz/laravel-epc-qr",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ccharz/laravel-epc-qr.git",
+                "reference": "ba4f2fc5e58b8087529421532ecee81282ba29ff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ccharz/laravel-epc-qr/zipball/ba4f2fc5e58b8087529421532ecee81282ba29ff",
+                "reference": "ba4f2fc5e58b8087529421532ecee81282ba29ff",
+                "shasum": ""
+            },
+            "require": {
+                "endroid/qr-code": "^5.0",
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "larastan/larastan": "^1.0|^2.0|^3.0",
+                "laravel/pint": "^1.21",
+                "orchestra/testbench": "^7.37|^8.17|^9.0|^10"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "EPCQR": "Ccharz\\LaravelEpcQr\\EPCQR"
+                    },
+                    "providers": [
+                        "Ccharz\\LaravelEpcQr\\LaravelEpcQrServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ccharz\\LaravelEpcQr\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Charzewski",
+                    "email": "chris@charzewski.at",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel EPC-QR-Code Generator for sepa payments",
+            "keywords": [
+                "epc",
+                "qr",
+                "sepa"
+            ],
+            "support": {
+                "issues": "https://github.com/ccharz/laravel-epc-qr/issues",
+                "source": "https://github.com/ccharz/laravel-epc-qr/tree/v3.0.0"
+            },
+            "time": "2025-02-26T14:28:57+00:00"
+        },
+        {
+            "name": "dasprid/enum",
+            "version": "1.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DASPRiD/Enum.git",
+                "reference": "b5874fa9ed0043116c72162ec7f4fb50e02e7cce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DASPRiD/Enum/zipball/b5874fa9ed0043116c72162ec7f4fb50e02e7cce",
+                "reference": "b5874fa9ed0043116c72162ec7f4fb50e02e7cce",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1 <9.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7 || ^8 || ^9 || ^10 || ^11",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DASPRiD\\Enum\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Scholzen 'DASPRiD'",
+                    "email": "mail@dasprids.de",
+                    "homepage": "https://dasprids.de/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP 7.1 enum implementation",
+            "keywords": [
+                "enum",
+                "map"
+            ],
+            "support": {
+                "issues": "https://github.com/DASPRiD/Enum/issues",
+                "source": "https://github.com/DASPRiD/Enum/tree/1.0.7"
+            },
+            "time": "2025-09-16T12:23:56+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -608,6 +775,78 @@
                 "source": "https://github.com/eklundkristoffer/seedster/tree/9.0"
             },
             "time": "2025-02-25T16:38:52+00:00"
+        },
+        {
+            "name": "endroid/qr-code",
+            "version": "5.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/endroid/qr-code.git",
+                "reference": "393fec6c4cbdc1bd65570ac9d245704428010122"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/endroid/qr-code/zipball/393fec6c4cbdc1bd65570ac9d245704428010122",
+                "reference": "393fec6c4cbdc1bd65570ac9d245704428010122",
+                "shasum": ""
+            },
+            "require": {
+                "bacon/bacon-qr-code": "^3.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "endroid/quality": "dev-main",
+                "ext-gd": "*",
+                "khanamiryan/qrcode-detector-decoder": "^2.0.2",
+                "setasign/fpdf": "^1.8.2"
+            },
+            "suggest": {
+                "ext-gd": "Enables you to write PNG images",
+                "khanamiryan/qrcode-detector-decoder": "Enables you to use the image validator",
+                "roave/security-advisories": "Makes sure package versions with known security issues are not installed",
+                "setasign/fpdf": "Enables you to use the PDF writer"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "5.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Endroid\\QrCode\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeroen van den Enden",
+                    "email": "info@endroid.nl"
+                }
+            ],
+            "description": "Endroid QR Code",
+            "homepage": "https://github.com/endroid/qr-code",
+            "keywords": [
+                "code",
+                "endroid",
+                "php",
+                "qr",
+                "qrcode"
+            ],
+            "support": {
+                "issues": "https://github.com/endroid/qr-code/issues",
+                "source": "https://github.com/endroid/qr-code/tree/5.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/endroid",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-09-08T08:52:55+00:00"
         },
         {
             "name": "fruitcake/php-cors",
@@ -1234,6 +1473,70 @@
             "time": "2025-04-03T16:45:58+00:00"
         },
         {
+            "name": "jeremykenedy/laravel-users",
+            "version": "v4.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeremykenedy/laravel-users.git",
+                "reference": "d01c46237558b20dbe73bc4491d10678fc986926"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeremykenedy/laravel-users/zipball/d01c46237558b20dbe73bc4491d10678fc986926",
+                "reference": "d01c46237558b20dbe73bc4491d10678fc986926",
+                "shasum": ""
+            },
+            "require": {
+                "laravellux/html": "^7.1",
+                "php": "^7.2|^8.0|^8.1|^8.2|^8.3"
+            },
+            "type": "package",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "jeremykenedy\\laravelusers\\LaravelUsersServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "jeremykenedy\\laravelusers\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "jeremykenedy",
+                    "email": "jeremykenedy@gmail.com"
+                }
+            ],
+            "description": "Laravel Users Management CRUD Package",
+            "keywords": [
+                "Users",
+                "crud",
+                "laravel",
+                "management"
+            ],
+            "support": {
+                "issues": "https://github.com/jeremykenedy/laravel-users/issues",
+                "source": "https://github.com/jeremykenedy/laravel-users/tree/v4.5.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeremykenedy",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/jeremykenedy",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2024-10-29T00:52:55+00:00"
+        },
+        {
             "name": "jobmetric/laravel-membership",
             "version": "1.3.0",
             "source": {
@@ -1366,6 +1669,69 @@
                 }
             ],
             "time": "2025-09-30T19:16:50+00:00"
+        },
+        {
+            "name": "kalnoy/nestedset",
+            "version": "v6.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lazychaser/laravel-nestedset.git",
+                "reference": "3cfc56a9759fb592bc903056166bfc0867f9e679"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lazychaser/laravel-nestedset/zipball/3cfc56a9759fb592bc903056166bfc0867f9e679",
+                "reference": "3cfc56a9759fb592bc903056166bfc0867f9e679",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/events": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "7.*|8.*|9.*|^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Kalnoy\\Nestedset\\NestedSetServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "v5.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Kalnoy\\Nestedset\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexander Kalnoy",
+                    "email": "lazychaser@gmail.com"
+                }
+            ],
+            "description": "Nested Set Model for Laravel 5.7 and up",
+            "keywords": [
+                "database",
+                "hierarchy",
+                "laravel",
+                "nested sets",
+                "nsm"
+            ],
+            "support": {
+                "issues": "https://github.com/lazychaser/laravel-nestedset/issues",
+                "source": "https://github.com/lazychaser/laravel-nestedset/tree/v6.0.6"
+            },
+            "time": "2025-04-22T19:38:02+00:00"
         },
         {
             "name": "laravel/framework",
@@ -1640,6 +2006,62 @@
             "time": "2025-09-02T15:31:25+00:00"
         },
         {
+            "name": "laravel/legacy-factories",
+            "version": "v1.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/legacy-factories.git",
+                "reference": "cd0f8c77d116bac121e9779fcff1f71801aaac50"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/legacy-factories/zipball/cd0f8c77d116bac121e9779fcff1f71801aaac50",
+                "reference": "cd0f8c77d116bac121e9779fcff1f71801aaac50",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/macroable": "^8.0|^9.0|^10.0|^11.0|^12.0",
+                "php": "^7.3|^8.0",
+                "symfony/finder": "^3.4|^4.0|^5.0|^6.0|^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Illuminate\\Database\\Eloquent\\LegacyFactoryServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "helpers.php"
+                ],
+                "psr-4": {
+                    "Illuminate\\Database\\Eloquent\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "The legacy version of the Laravel Eloquent factories.",
+            "homepage": "http://laravel.com",
+            "support": {
+                "issues": "https://github.com/laravel/framework/issues",
+                "source": "https://github.com/laravel/framework"
+            },
+            "time": "2025-01-24T15:41:36+00:00"
+        },
+        {
             "name": "laravel/prompts",
             "version": "v0.3.5",
             "source": {
@@ -1824,6 +2246,82 @@
                 "source": "https://github.com/laravel/tinker/tree/v2.10.1"
             },
             "time": "2025-01-27T14:24:01+00:00"
+        },
+        {
+            "name": "laravellux/html",
+            "version": "v7.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/LaravelLux/html.git",
+                "reference": "f5deadf67144fed05399e2c5967998d35a3dd10c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LaravelLux/html/zipball/f5deadf67144fed05399e2c5967998d35a3dd10c",
+                "reference": "f5deadf67144fed05399e2c5967998d35a3dd10c",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/routing": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/session": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/view": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "illuminate/database": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "mockery/mockery": "~1.6.2",
+                "phpunit/phpunit": "~8.5|^9.5.10|^10.1|^11.0.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Form": "LaravelLux\\Html\\FormFacade",
+                        "Html": "LaravelLux\\Html\\HtmlFacade"
+                    },
+                    "providers": [
+                        "LaravelLux\\Html\\HtmlServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "6.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "LaravelLux\\Html\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Adam Mudd",
+                    "email": "admin@adammudd.co.uk"
+                },
+                {
+                    "name": "Adam Engebretson",
+                    "email": "adam@laravelcollective.com"
+                },
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylorotwell@gmail.com"
+                }
+            ],
+            "description": "HTML and Form Builders for the Laravel Framework",
+            "homepage": "https://website.com.se",
+            "support": {
+                "issues": "https://github.com/laravellux/html/issues",
+                "source": "https://github.com/laravellux/html"
+            },
+            "time": "2025-02-26T09:10:23+00:00"
         },
         {
             "name": "league/commonmark",
@@ -6646,6 +7144,67 @@
                 "source": "https://github.com/wikimedia/composer-merge-plugin/tree/v2.1.0"
             },
             "time": "2023-04-15T19:07:00+00:00"
+        },
+        {
+            "name": "xoco70/laravel-tournaments",
+            "version": "0.17",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/xoco70/laravel-tournaments.git",
+                "reference": "30d3133322d13ce5aa5f648d651042e6cc79c777"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/xoco70/laravel-tournaments/zipball/30d3133322d13ce5aa5f648d651042e6cc79c777",
+                "reference": "30d3133322d13ce5aa5f648d651042e6cc79c777",
+                "shasum": ""
+            },
+            "require": {
+                "kalnoy/nestedset": "^6.0",
+                "laravel/legacy-factories": "^1.3",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "fzaninotto/faker": "1.*",
+                "laravel/browser-kit-testing": "^6.0",
+                "orchestra/database": "~6.1",
+                "orchestra/testbench-browser-kit": "~6.0",
+                "phpunit/phpunit": "^8.5",
+                "symfony/var-dumper": "~5.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Xoco70\\LaravelTournaments\\TournamentsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Xoco70\\LaravelTournaments\\": "src"
+                },
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "juliatzin",
+                    "email": "julien@cappiello.fr"
+                }
+            ],
+            "description": "A Laravel 5.4+ Package that allows you to generate Tournaments tree",
+            "homepage": "https://github.com/xoco70/laravel-tournaments",
+            "support": {
+                "issues": "https://github.com/xoco70/laravel-tournaments/issues",
+                "source": "https://github.com/xoco70/laravel-tournaments/tree/0.17"
+            },
+            "time": "2023-09-19T09:17:38+00:00"
         }
     ],
     "packages-dev": [
