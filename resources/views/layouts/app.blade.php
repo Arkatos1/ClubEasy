@@ -29,6 +29,21 @@
                     <a href="{{ url('/matches') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('matches') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Matches</a>
                     <a href="{{ url('/results') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('results') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Results</a>
                     <a href="{{ url('/about') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('about') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">About Us</a>
+
+                    @auth
+                        <!-- Membership Tab for all authenticated users -->
+                        <a href="{{ route('membership.index') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('membership*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Membership</a>
+
+                        <!-- Trainer-specific tabs -->
+                        @if($is_trainer || $is_admin)
+                            <a href="{{ route('trainer.dashboard') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('trainer*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Trainer Panel</a>
+                        @endif
+
+                        <!-- Admin-specific tabs -->
+                        @if($is_admin)
+                            <a href="{{ route('admin.dashboard') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('admin*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Admin</a>
+                        @endif
+                    @endauth
                 </div>
 
                 <!-- Auth Links -->

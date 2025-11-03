@@ -42,10 +42,10 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Assign "visitor" role to new user
-        $visitorRole = Role::where('slug', 'visitor')->first();
-        if ($visitorRole) {
-            $user->attachRole($visitorRole);
+        // Assign "user" role to a new user
+        $userRole = Role::where('slug', 'user')->first();
+        if ($userRole) {
+            $user->attachRole($userRole);
         }
 
         event(new Registered($user));

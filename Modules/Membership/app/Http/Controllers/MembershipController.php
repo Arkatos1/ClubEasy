@@ -2,55 +2,35 @@
 
 namespace Modules\Membership\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controller;
 
 class MembershipController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        return view('membership::index');
+        return view('membership::index', [
+            'user' => \Illuminate\Support\Facades\Auth::user(),
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function plans(): View
     {
-        return view('membership::create');
+        return view('membership::plans');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function status(): View
     {
-        return view('membership::show');
+        return view('membership::status', [
+            'user' => \Illuminate\Support\Facades\Auth::user(),
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function subscribe(Request $request): RedirectResponse
     {
-        return view('membership::edit');
+        // TODO: Integrate with jobmetric/laravel-membership
+        return redirect()->route('membership.status')->with('success', 'Membership subscription updated!');
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }

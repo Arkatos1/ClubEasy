@@ -3,55 +3,41 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use jeremykenedy\LaravelRoles\Models\Role;
 
 class RolesTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        /*
-         * Role Types
-         *
-         */
-        $RoleItems = [
+        $roles = [
             [
-                'name'        => 'Admin',
-                'slug'        => 'admin',
-                'description' => 'Admin Role',
-                'level'       => 5,
+                'name' => 'Visitor',
+                'slug' => 'visitor',
+                'description' => 'Unauthenticated visitor',
+                'level' => 0,
             ],
             [
-                'name'        => 'User',
-                'slug'        => 'user',
-                'description' => 'User Role',
-                'level'       => 1,
+                'name' => 'User',
+                'slug' => 'user',
+                'description' => 'Registered club member',
+                'level' => 1,
             ],
             [
-                'name'        => 'Unverified',
-                'slug'        => 'unverified',
-                'description' => 'Unverified Role',
-                'level'       => 0,
+                'name' => 'Trainer',
+                'slug' => 'trainer',
+                'description' => 'Club trainer/coach',
+                'level' => 2,
+            ],
+            [
+                'name' => 'Administrator',
+                'slug' => 'administrator',
+                'description' => 'System administrator',
+                'level' => 3,
             ],
         ];
 
-        /*
-         * Add Role Items
-         *
-         */
-        foreach ($RoleItems as $RoleItem) {
-            $newRoleItem = config('roles.models.role')::where('slug', '=', $RoleItem['slug'])->first();
-            if ($newRoleItem === null) {
-                $newRoleItem = config('roles.models.role')::create([
-                    'name'          => $RoleItem['name'],
-                    'slug'          => $RoleItem['slug'],
-                    'description'   => $RoleItem['description'],
-                    'level'         => $RoleItem['level'],
-                ]);
-            }
+        foreach ($roles as $role) {
+            Role::firstOrCreate(['slug' => $role['slug']], $role);
         }
     }
 }

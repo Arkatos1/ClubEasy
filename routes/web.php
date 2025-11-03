@@ -52,4 +52,11 @@ Route::group(['middleware' => ['role:admin']], function () {
     Route::get('/admin/users', 'UserManagementController@index');
 });
 
+// Trainer Routes
+Route::middleware(['auth', 'verified', 'role:trainer|administrator'])->prefix('trainer')->name('trainer.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('trainer.dashboard');
+    })->name('dashboard');
+});
+
 require __DIR__.'/auth.php';
