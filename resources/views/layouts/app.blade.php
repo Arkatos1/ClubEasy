@@ -35,13 +35,13 @@
                         <a href="{{ route('membership.index') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('membership*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Membership</a>
 
                         <!-- Trainer-specific tabs -->
-                        @if($is_trainer || $is_admin)
+                        @if((isset($is_trainer) && $is_trainer) || (isset($is_admin) && $is_admin))
                             <a href="{{ route('trainer.dashboard') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('trainer*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Trainer Panel</a>
                         @endif
 
                         <!-- Admin-specific tabs -->
-                        @if($is_admin)
-                            <a href="{{ route('admin.dashboard') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('admin*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Admin</a>
+                        @if(isset($is_admin) && $is_admin)
+                            <a href="/admin" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('admin*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Admin</a>
                         @endif
                     @endauth
                 </div>

@@ -23,16 +23,28 @@ class RolesTableSeeder extends Seeder
                 'level' => 1,
             ],
             [
+                'name' => 'Player',
+                'slug' => 'player',
+                'description' => 'Sports player',
+                'level' => 2,
+            ],
+            [
+                'name' => 'Parent',
+                'slug' => 'parent',
+                'description' => 'Player parent/guardian',
+                'level' => 2,
+            ],
+            [
                 'name' => 'Trainer',
                 'slug' => 'trainer',
                 'description' => 'Club trainer/coach',
-                'level' => 2,
+                'level' => 3,
             ],
             [
                 'name' => 'Administrator',
                 'slug' => 'administrator',
                 'description' => 'System administrator',
-                'level' => 3,
+                'level' => 10,
             ],
         ];
 

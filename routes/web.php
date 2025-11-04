@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
+use App\Http\Controllers\DashboardController;
 
 // Public Routes
 Route::get('/', function () {
@@ -18,11 +19,6 @@ Route::get('/tournaments', function () {
 Route::resource('players', PlayerController::class);
 
 // Navigation Pages
-
-Route::get('/players', function () {
-    return view('pages.players');
-});
-
 Route::get('/matches', function () {
     return view('pages.matches');
 });
@@ -37,9 +33,7 @@ Route::get('/about', function () {
 
 // Auth Protected Routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 Route::middleware('auth')->group(function () {
@@ -48,8 +42,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::group(['middleware' => ['role:admin']], function () {
-    Route::get('/admin/users', 'UserManagementController@index');
+// Membership Routes
+Route::middleware(['auth', 'verified'])->prefix('membership')->name('membership.')->group(function () {
+    Route::get('/', function () { return view('membership::index'); })->name('index');
+    Route::get('/plans', function () { return view('membership::plans'); })->name('plans');
+    Route::get('/status', function () { return view('membership::status'); })->name('status');
+    Route::post('/subscribe', function () { return redirect()->route('membership.status')->with('success', 'Updated!'); })->name('subscribe');
 });
 
 // Trainer Routes
@@ -57,6 +55,21 @@ Route::middleware(['auth', 'verified', 'role:trainer|administrator'])->prefix('t
     Route::get('/dashboard', function () {
         return view('trainer.dashboard');
     })->name('dashboard');
+});
+
+// System Admin Routes (Custom admin to avoid conflict with Twill)
+Route::middleware(['auth', 'verified', 'role:administrator'])->prefix('system')->name('system.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
+
+    Route::get('/users', function () {
+        return view('admin.users');
+    })->name('users');
+
+    Route::get('/roles', function () {
+        return view('admin.roles');
+    })->name('roles');
 });
 
 require __DIR__.'/auth.php';
