@@ -41,21 +41,21 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        {!! Form::open(array('route' => 'users.store', 'method' => 'POST', 'role' => 'form', 'class' => 'needs-validation')) !!}
-                            {!! csrf_field() !!}
+                        <form method="POST" action="{{ route('users.store') }}" role="form" class="needs-validation">
+                            @csrf
                             <div class="form-group has-feedback row {{ $errors->has('email') ? ' has-error ' : '' }}">
                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                    {!! Form::label('email', trans('laravelusers::forms.create_user_label_email'), array('class' => 'col-md-3 control-label')); !!}
+                                    <label for="email" class="col-md-3 control-label">{{ trans('laravelusers::forms.create_user_label_email') }}</label>
                                 @endif
                                 <div class="col-md-9">
                                     <div class="input-group">
-                                        {!! Form::text('email', NULL, array('id' => 'email', 'class' => 'form-control', 'placeholder' => trans('laravelusers::forms.create_user_ph_email'))) !!}
+                                        <input type="text" name="email" id="email" class="form-control" value="{{ old('email') }}" placeholder="{{ trans('laravelusers::forms.create_user_ph_email') }}">
                                         <div class="input-group-append">
                                             <label for="email" class="input-group-text">
                                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                                    <i class="fa fa-fw {!! trans('laravelusers::forms.create_user_icon_email') !!}" aria-hidden="true"></i>
+                                                    <i class="fa fa-fw {{ trans('laravelusers::forms.create_user_icon_email') }}" aria-hidden="true"></i>
                                                 @else
-                                                    {!! trans('laravelusers::forms.create_user_label_email') !!}
+                                                    {{ trans('laravelusers::forms.create_user_label_email') }}
                                                 @endif
                                             </label>
                                         </div>
@@ -69,17 +69,17 @@
                             </div>
                             <div class="form-group has-feedback row {{ $errors->has('name') ? ' has-error ' : '' }}">
                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                    {!! Form::label('name', trans('laravelusers::forms.create_user_label_username'), array('class' => 'col-md-3 control-label')); !!}
+                                    <label for="name" class="col-md-3 control-label">{{ trans('laravelusers::forms.create_user_label_username') }}</label>
                                 @endif
                                 <div class="col-md-9">
                                     <div class="input-group">
-                                        {!! Form::text('name', NULL, array('id' => 'name', 'class' => 'form-control', 'placeholder' => trans('laravelusers::forms.create_user_ph_username'))) !!}
+                                        <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" placeholder="{{ trans('laravelusers::forms.create_user_ph_username') }}">
                                         <div class="input-group-append">
                                             <label class="input-group-text" for="name">
                                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                                    <i class="fa fa-fw {!! trans('laravelusers::forms.create_user_icon_username') !!}" aria-hidden="true"></i>
+                                                    <i class="fa fa-fw {{ trans('laravelusers::forms.create_user_icon_username') }}" aria-hidden="true"></i>
                                                 @else
-                                                    {!! trans('laravelusers::forms.create_user_label_username') !!}
+                                                    {{ trans('laravelusers::forms.create_user_label_username') }}
                                                 @endif
                                             </label>
                                         </div>
@@ -94,24 +94,24 @@
                             @if($rolesEnabled)
                                 <div class="form-group has-feedback row {{ $errors->has('role') ? ' has-error ' : '' }}">
                                     @if(config('laravelusers.fontAwesomeEnabled'))
-                                        {!! Form::label('role', trans('laravelusers::forms.create_user_label_role'), array('class' => 'col-md-3 control-label')); !!}
+                                        <label for="role" class="col-md-3 control-label">{{ trans('laravelusers::forms.create_user_label_role') }}</label>
                                     @endif
                                     <div class="col-md-9">
                                     <div class="input-group">
                                         <select class="custom-select form-control" name="role" id="role">
-                                            <option value="">{!! trans('laravelusers::forms.create_user_ph_role') !!}</option>
+                                            <option value="">{{ trans('laravelusers::forms.create_user_ph_role') }}</option>
                                             @if ($roles)
                                                 @foreach($roles as $role)
-                                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                                    <option value="{{ $role->id }}" {{ old('role') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
                                                 @endforeach
                                             @endif
                                         </select>
                                         <div class="input-group-append">
                                             <label class="input-group-text" for="role">
                                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                                    <i class="{!! trans('laravelusers::forms.create_user_icon_role') !!}" aria-hidden="true"></i>
+                                                    <i class="{{ trans('laravelusers::forms.create_user_icon_role') }}" aria-hidden="true"></i>
                                                 @else
-                                                    {!! trans('laravelusers::forms.create_user_label_username') !!}
+                                                    {{ trans('laravelusers::forms.create_user_label_username') }}
                                                 @endif
                                             </label>
                                         </div>
@@ -126,17 +126,17 @@
                             @endif
                             <div class="form-group has-feedback row {{ $errors->has('password') ? ' has-error ' : '' }}">
                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                    {!! Form::label('password', trans('laravelusers::forms.create_user_label_password'), array('class' => 'col-md-3 control-label')); !!}
+                                    <label for="password" class="col-md-3 control-label">{{ trans('laravelusers::forms.create_user_label_password') }}</label>
                                 @endif
                                 <div class="col-md-9">
                                     <div class="input-group">
-                                        {!! Form::password('password', array('id' => 'password', 'class' => 'form-control ', 'placeholder' => trans('laravelusers::forms.create_user_ph_password'))) !!}
+                                        <input type="password" name="password" id="password" class="form-control" placeholder="{{ trans('laravelusers::forms.create_user_ph_password') }}">
                                         <div class="input-group-append">
                                             <label class="input-group-text" for="password">
                                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                                    <i class="fa fa-fw {!! trans('laravelusers::forms.create_user_icon_password') !!}" aria-hidden="true"></i>
+                                                    <i class="fa fa-fw {{ trans('laravelusers::forms.create_user_icon_password') }}" aria-hidden="true"></i>
                                                 @else
-                                                    {!! trans('laravelusers::forms.create_user_label_password') !!}
+                                                    {{ trans('laravelusers::forms.create_user_label_password') }}
                                                 @endif
                                             </label>
                                         </div>
@@ -150,17 +150,17 @@
                             </div>
                             <div class="form-group has-feedback row {{ $errors->has('password_confirmation') ? ' has-error ' : '' }}">
                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                    {!! Form::label('password_confirmation', trans('laravelusers::forms.create_user_label_pw_confirmation'), array('class' => 'col-md-3 control-label')); !!}
+                                    <label for="password_confirmation" class="col-md-3 control-label">{{ trans('laravelusers::forms.create_user_label_pw_confirmation') }}</label>
                                 @endif
                                 <div class="col-md-9">
                                     <div class="input-group">
-                                        {!! Form::password('password_confirmation', array('id' => 'password_confirmation', 'class' => 'form-control', 'placeholder' => trans('laravelusers::forms.create_user_ph_pw_confirmation'))) !!}
+                                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="{{ trans('laravelusers::forms.create_user_ph_pw_confirmation') }}">
                                         <div class="input-group-append">
                                             <label class="input-group-text" for="password_confirmation">
                                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                                    <i class="fa fa-fw {!! trans('laravelusers::forms.create_user_icon_pw_confirmation') !!}" aria-hidden="true"></i>
+                                                    <i class="fa fa-fw {{ trans('laravelusers::forms.create_user_icon_pw_confirmation') }}" aria-hidden="true"></i>
                                                 @else
-                                                    {!! trans('laravelusers::forms.create_user_label_pw_confirmation') !!}
+                                                    {{ trans('laravelusers::forms.create_user_label_pw_confirmation') }}
                                                 @endif
                                             </label>
                                         </div>
@@ -172,8 +172,10 @@
                                     @endif
                                 </div>
                             </div>
-                            {!! Form::button(trans('laravelusers::forms.create_user_button_text'), array('class' => 'btn btn-success margin-bottom-1 mb-1 float-right','type' => 'submit' )) !!}
-                        {!! Form::close() !!}
+                            <button type="submit" class="btn btn-success margin-bottom-1 mb-1 float-right">
+                                {{ trans('laravelusers::forms.create_user_button_text') }}
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
