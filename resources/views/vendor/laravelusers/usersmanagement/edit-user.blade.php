@@ -1,7 +1,7 @@
 @extends(config('laravelusers.laravelUsersBladeExtended'))
 
 @section('template_title')
-    {!! trans('laravelusers::laravelusers.editing-user', ['name' => $user->name]) !!}
+    {{ trans('laravelusers::laravelusers.editing-user', ['name' => $user->name]) }}
 @endsection
 
 @section('template_linked_css')
@@ -29,19 +29,19 @@
                 <div class="card">
                     <div class="card-header">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            {!! trans('laravelusers::laravelusers.editing-user', ['name' => $user->name]) !!}
+                            {{ trans('laravelusers::laravelusers.editing-user', ['name' => $user->name]) }}
                             <div class="pull-right">
-                                <a href="{{ route('users') }}" class="btn btn-light btn-sm float-right" data-toggle="tooltip" data-placement="top" title="{!! trans('laravelusers::laravelusers.tooltips.back-users') !!}">
+                                <a href="{{ route('users') }}" class="btn btn-light btn-sm float-right" data-toggle="tooltip" data-placement="top" title="{{ trans('laravelusers::laravelusers.tooltips.back-users') }}">
                                     @if(config('laravelusers.fontAwesomeEnabled'))
                                         <i class="fas fa-fw fa-reply-all" aria-hidden="true"></i>
                                     @endif
-                                    {!! trans('laravelusers::laravelusers.buttons.back-to-users') !!}
+                                    {{ trans('laravelusers::laravelusers.buttons.back-to-users') }}
                                 </a>
-                                <a href="{{ url('/users/' . $user->id) }}" class="btn btn-light btn-sm float-right" data-toggle="tooltip" data-placement="left" title="{!! trans('laravelusers::laravelusers.tooltips.back-user') !!}">
+                                <a href="{{ url('/users/' . $user->id) }}" class="btn btn-light btn-sm float-right" data-toggle="tooltip" data-placement="left" title="{{ trans('laravelusers::laravelusers.tooltips.back-user') }}">
                                     @if(config('laravelusers.fontAwesomeEnabled'))
                                         <i class="fas fa-fw fa-reply" aria-hidden="true"></i>
                                     @endif
-                                    {!! trans('laravelusers::laravelusers.buttons.back-to-user') !!}
+                                    {{ trans('laravelusers::laravelusers.buttons.back-to-user') }}
                                 </a>
                             </div>
                         </div>
@@ -187,13 +187,16 @@
                             </div>
                             <div class="row">
                                 <div class="col-12 col-sm-6 mb-2">
-                                    <a href="#" class="btn btn-outline-secondary btn-block btn-change-pw mt-3" title="{!! trans('laravelusers::forms.change-pw') !!}">
+                                    <a href="#" class="btn btn-outline-secondary btn-block btn-change-pw mt-3" title="{{ trans('laravelusers::forms.change-pw') }}">
                                         <i class="fa fa-fw fa-lock" aria-hidden="true"></i>
-                                        <span></span> {!! trans('laravelusers::forms.change-pw') !!}
+                                        <span></span> {{ trans('laravelusers::forms.change-pw') }}
                                     </a>
                                 </div>
                                 <div class="col-12 col-sm-6">
                                     <button type="button" class="btn btn-success btn-block margin-bottom-1 mt-3 mb-2 btn-save" data-toggle="modal" data-target="#confirmSave" data-title="{{ trans('laravelusers::modals.edit_user__modal_text_confirm_title') }}" data-message="{{ trans('laravelusers::modals.edit_user__modal_text_confirm_message') }}">
+                                        @if(config('laravelusers.fontAwesomeEnabled'))
+                                            <i class="fa fa-fw fa-save" aria-hidden="true"></i>
+                                        @endif
                                         {{ trans('laravelusers::forms.save-changes') }}
                                     </button>
                                 </div>
@@ -218,4 +221,3 @@
         @include('laravelusers::scripts.tooltips')
     @endif
 @endsection
-

@@ -64,7 +64,7 @@ return [
     'create_user_ph_role'               => 'Select User Role',
     'create_user_icon_role'             => 'fas fa-fw fas fa-shield-alt',
 
-    'create_user_button_text'           => '<i class="fa fa-user-plus" aria-hidden="true"></i> Create New User',
+    'create_user_button_text'           => 'Create New User',
 
     // EDIT USER AS ADMINISTRATOR FORM
     'edit-user-admin-title'             => 'Edit User Information',
@@ -88,7 +88,7 @@ return [
 
     'change-pw'                         => 'Change Password',
     'cancel'                            => 'Cancel',
-    'save-changes'                      => '<i class="fa fa-fw fa-save" aria-hidden="true"></i> Save Changes',
+    'save-changes'                      => 'Save Changes',
 
     // Search Users Form
     'search-users-ph'                   => 'Search Users',
