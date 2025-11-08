@@ -31,7 +31,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             {{ trans('laravelusers::laravelusers.editing-user', ['name' => $user->name]) }}
                             <div class="pull-right">
-                                <a href="{{ route('users') }}" class="btn btn-light btn-sm float-right" data-toggle="tooltip" data-placement="top" title="{{ trans('laravelusers::laravelusers.tooltips.back-users') }}">
+                                <a href="{{ route('users.index') }}" class="btn btn-light btn-sm float-right" data-toggle="tooltip" data-placement="top" title="{{ trans('laravelusers::laravelusers.tooltips.back-users') }}">
                                     @if(config('laravelusers.fontAwesomeEnabled'))
                                         <i class="fas fa-fw fa-reply-all" aria-hidden="true"></i>
                                     @endif

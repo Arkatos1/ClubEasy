@@ -72,4 +72,23 @@ Route::middleware(['auth', 'verified', 'role:administrator'])->prefix('system')-
     })->name('roles');
 });
 
+Route::get('/users', function () {
+    return app()->make(\jeremykenedy\LaravelUsers\App\Http\Controllers\UsersManagementController::class)->index();
+})->name('users')->middleware(['auth', 'verified', 'role:administrator']);
+
+Route::middleware(['auth', 'verified'])->prefix('membership')->name('membership.')->group(function () {
+    Route::get('/', function () { return view('membership::index'); })->name('index');
+    Route::get('/plans', function () { return view('membership::plans'); })->name('plans');
+    Route::get('/status', function () { return view('membership::status'); })->name('status');
+    Route::post('/subscribe', function () { return redirect()->route('membership.status')->with('success', 'Updated!'); })->name('subscribe');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Only allow administrators to access user management
+    Route::middleware(['role:administrator'])->group(function () {
+        Route::resource('users', \jeremykenedy\LaravelUsers\App\Http\Controllers\UsersManagementController::class);
+    });
+});
+
+
 require __DIR__.'/auth.php';
