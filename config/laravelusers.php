@@ -9,7 +9,7 @@ return [
     */
 
     // The parent blade file
-    'laravelUsersBladeExtended'     => 'laravelusers::layouts.app', // 'layouts.app'
+    'laravelUsersBladeExtended'     => 'laravelusers::layouts.hybrid-app',
 
     // Enable `auth` middleware
     'authEnabled'                   => true,
