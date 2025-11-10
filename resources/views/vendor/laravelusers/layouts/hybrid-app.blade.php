@@ -34,12 +34,15 @@
                     <a href="{{ url('/about') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('about') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">About Us</a>
 
                     @auth
+                        <!-- Membership Tab for all authenticated users -->
                         <a href="{{ route('membership.index') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('membership*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Membership</a>
 
+                        <!-- Trainer-specific tabs -->
                         @if(auth()->user()->hasRole('trainer') || auth()->user()->hasRole('administrator'))
                             <a href="{{ route('trainer.dashboard') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('trainer*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Trainer Panel</a>
                         @endif
 
+                        <!-- Admin-specific tabs -->
                         @if(auth()->user()->hasRole('administrator'))
                             <a href="/admin" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('admin*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Admin</a>
                             <a href="{{ route('users.index') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('users*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Users</a>

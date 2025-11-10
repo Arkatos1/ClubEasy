@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-    <!-- Scripts -->
+    <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
@@ -24,11 +24,7 @@
     <!-- Main Content - This will grow to push footer down -->
     <main class="flex-1">
         <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div class="flex justify-center">
-                <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                    {{ $slot }}
-                </div>
-            </div>
+            @yield('content')
         </div>
     </main>
 

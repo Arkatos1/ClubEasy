@@ -7,7 +7,7 @@ use App\Http\Controllers\DashboardController;
 
 // Public Routes
 Route::get('/', function () {
-    return view('home');
+    return view('pages.home');
 });
 
 // Feature-Flagged Routes
