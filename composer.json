@@ -8,7 +8,7 @@
     "require": {
         "php": "^8.2",
         "ably/ably-php": "*",
-        "area17/twill": "^3.5",
+        "austintoddj/canvas": "^6.0",
         "ccharz/laravel-epc-qr": "^3.0",
         "jeremykenedy/laravel-roles": "^11.5",
         "jeremykenedy/laravel-users": "^4.5",
