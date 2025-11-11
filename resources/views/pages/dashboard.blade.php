@@ -12,9 +12,7 @@
                     <div class="bg-red-50 p-4 rounded-lg mb-4">
                         <h3 class="text-lg font-semibold text-red-800">Administrator Panel</h3>
                         <p class="text-red-600">You have administrative privileges.</p>
-                        <a href="/admin" class="text-red-700 hover:text-red-900 font-medium">Go to Twill Admin →</a>
-                        <br>
-                        <a href="{{ route('users.index') }}" class="text-red-700 hover:text-red-900 font-medium">Manage Users →</a>
+                        <a href="{{ route('users.index') }}" class="text-red-700 hover:text-red-900 font-medium">Manage Users</a>
                     </div>
                 @endif
 
