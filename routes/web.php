@@ -1,14 +1,17 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\DashboardController;
 
-// Public Routes
-Route::get('/', function () {
-    return view('pages.home');
-});
+// Public Routes - Home page IS the blog
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Individual blog post routes
+Route::get('/blog/{slug}', [HomeController::class, 'showPost'])->name('blog.show');
+Route::get('/topic/{slug}', [HomeController::class, 'topic'])->name('blog.topic');
 
 // Feature-Flagged Routes
 Route::get('/tournaments', function () {
@@ -75,13 +78,6 @@ Route::middleware(['auth', 'verified', 'role:administrator'])->prefix('system')-
 Route::get('/users', function () {
     return app()->make(\jeremykenedy\LaravelUsers\App\Http\Controllers\UsersManagementController::class)->index();
 })->name('users')->middleware(['auth', 'verified', 'role:administrator']);
-
-Route::middleware(['auth', 'verified'])->prefix('membership')->name('membership.')->group(function () {
-    Route::get('/', function () { return view('membership::index'); })->name('index');
-    Route::get('/plans', function () { return view('membership::plans'); })->name('plans');
-    Route::get('/status', function () { return view('membership::status'); })->name('status');
-    Route::post('/subscribe', function () { return redirect()->route('membership.status')->with('success', 'Updated!'); })->name('subscribe');
-});
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Only allow administrators to access user management

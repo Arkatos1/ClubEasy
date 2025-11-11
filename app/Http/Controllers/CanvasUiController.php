@@ -25,6 +25,11 @@ class CanvasUiController extends Controller
                 'canvasPath' => config('canvas.path'),
                 'user' => $request->user('canvas'),
                 'timezone' => config('app.timezone'),
+                // Add vite assets instead of mix
+                'assets' => [
+                    'css' => asset('css/app.css'), // or your vite compiled CSS
+                    'js' => asset('js/app.js'),    // or your vite compiled JS
+                ]
             ],
         ]);
     }

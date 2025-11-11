@@ -20,6 +20,7 @@
 
                     <!-- Admin-specific tabs -->
                     @if(auth()->user()->hasRole('administrator'))
+                        <a href="{{ url('/canvas') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('canvas*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Canvas</a>
                         <a href="/admin" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('admin*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Admin</a>
                         <a href="{{ route('users.index') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('users*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Users</a>
                     @endif
