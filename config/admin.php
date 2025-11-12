@@ -158,7 +158,7 @@ return [
     'upload' => [
 
         // Disk in `config/filesystem.php`.
-        'disk' => 'admin',
+        'disk' => 'public',
 
         // Image and file upload path under the disk above.
         'directory' => [
@@ -178,7 +178,7 @@ return [
     'database' => [
 
         // Database connection for following tables.
-        'connection' => '',
+        'connection' => env('DB_CONNECTION', 'mysql'),
 
         // User tables and model.
         'users_table' => 'admin_users',

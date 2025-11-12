@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Route;
+
+Admin::routes();
 
 Route::group([
     'prefix'        => config('admin.route.prefix'),
@@ -12,7 +13,4 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
 
-    // Add your admin routes here
-    // $router->resource('users', 'UserController');
-    // $router->resource('roles', 'RoleController');
 });
