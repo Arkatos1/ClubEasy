@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5163266bf3370365f6586a3fe4f46f5b",
+    "content-hash": "6dbe07fe8340c7e91ae481da6c9044ff",
     "packages": [
         {
             "name": "ably/ably-php",
@@ -3870,6 +3870,60 @@
                 }
             ],
             "time": "2025-06-29T09:23:53+00:00"
+        },
+        {
+            "name": "open-admin-ext/media-manager",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/open-admin-org/media-manager.git",
+                "reference": "4613f4d4a12f4787ce738000354db7a93649b60c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/open-admin-org/media-manager/zipball/4613f4d4a12f4787ce738000354db7a93649b60c",
+                "reference": "4613f4d4a12f4787ce738000354db7a93649b60c",
+                "shasum": ""
+            },
+            "require": {
+                "open-admin-org/open-admin": "~1.0",
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "OpenAdmin\\Admin\\Media\\MediaServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OpenAdmin\\Admin\\Media\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "open-admin",
+                    "email": "info@open-admin.org"
+                }
+            ],
+            "description": "Media manager for open-admin",
+            "homepage": "https://github.com/open-admin-org/media-manager",
+            "keywords": [
+                "manager",
+                "media",
+                "open-admin"
+            ],
+            "support": {
+                "issues": "https://github.com/open-admin-org/media-manager/issues",
+                "source": "https://github.com/open-admin-org/media-manager/tree/v1.0.3"
+            },
+            "time": "2023-01-10T13:46:10+00:00"
         },
         {
             "name": "open-admin-org/open-admin",
