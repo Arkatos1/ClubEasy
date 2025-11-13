@@ -121,7 +121,7 @@ class TreeController extends Controller
             Team::create([
                 'championship_id' => $championship->id,
                 'name' => 'Team ' . $i,
-                'short_id' => 'T' . $i
+                'short_id' => $i  // Changed from 'T'.$i to just $i
             ]);
         }
     } else {
