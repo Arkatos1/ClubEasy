@@ -1,10 +1,33 @@
 <?php
 
+use App\Http\Controllers\SimpleTournamentController;
+use App\Http\Controllers\TournamentController;
+use App\Http\Controllers\TreeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\DashboardController;
+
+// Tournaments Routes
+Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
+Route::get('/tournaments/{id}', [TournamentController::class, 'show'])->name('tournaments.show');
+Route::get('/tournaments/{tournament}/championships/{championship}', [TournamentController::class, 'showChampionship'])->name('tournaments.championship');
+Route::post('/tournaments/create-demo', [TournamentController::class, 'createDemo'])->name('tournaments.create-demo');
+
+// Tournament Tree Routes (required by package views)
+Route::put('/championships/{championship}/trees', [TournamentController::class, 'updateTree'])->name('tree.update');
+
+// Package Tree Routes (the actual package demo routes)
+Route::get('/trees', [TreeController::class, 'index'])->name('tree.index');
+Route::get('/trees/{championship}', [TreeController::class, 'show'])->name('tree.show');
+Route::post('/trees/{championship}', action: [TreeController::class, 'store'])->name('tree.store');
+Route::put('/trees/{championship}', [TreeController::class, 'update'])->name('tree.update');
+
+// Simple tournament routes (using only tournament table)
+Route::get('/simple-tournament', [SimpleTournamentController::class, 'index'])->name('simple.tournament');
+Route::post('/simple-tournament/generate', [SimpleTournamentController::class, 'generate'])->name('simple.tournament.generate');
+Route::get('/simple-tournament/{id}', [SimpleTournamentController::class, 'show'])->name('simple.tournament.show');
 
 // Public Routes - Home page IS the blog
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -14,9 +37,7 @@ Route::get('/blog/{slug}', [HomeController::class, 'showPost'])->name('blog.show
 Route::get('/topic/{slug}', [HomeController::class, 'topic'])->name('blog.topic');
 
 // Feature-Flagged Routes
-Route::get('/tournaments', function () {
-    return view('tournaments');
-});
+
 
 // Resource Routes
 Route::resource('players', PlayerController::class);

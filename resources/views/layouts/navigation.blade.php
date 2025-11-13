@@ -8,6 +8,8 @@
                 <a href="{{ url('/matches') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('matches') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Matches</a>
                 <a href="{{ url('/results') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('results') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Results</a>
                 <a href="{{ url('/about') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('about') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">About Us</a>
+                <a href="{{ url('/tournaments') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('tournaments*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Tournaments</a>
+                <a href="{{ route('tree.index') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('trees*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Tournament Generator</a>
 
                 @auth
                     <!-- Membership Tab for all authenticated users -->
