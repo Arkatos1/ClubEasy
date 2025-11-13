@@ -57,4 +57,17 @@ return [
         'seedQuantity'         => '4',
 
     ],
+
+    'models' => [
+        'tournament' => Xoco70\LaravelTournaments\Models\Tournament::class,
+        'championship' => Xoco70\LaravelTournaments\Models\Championship::class,
+        'category' => Xoco70\LaravelTournaments\Models\Category::class,
+        'competitor' => Xoco70\LaravelTournaments\Models\Competitor::class,
+        'team' => Xoco70\LaravelTournaments\Models\Team::class,
+        'fighters_group' => Xoco70\LaravelTournaments\Models\FightersGroup::class,
+        'fight' => Xoco70\LaravelTournaments\Models\Fight::class,
+        'user' => App\Models\User::class,
+        'venue' => Xoco70\LaravelTournaments\Models\Venue::class,
+    ],
+
 ];

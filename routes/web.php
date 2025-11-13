@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TreeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -14,9 +15,10 @@ Route::get('/blog/{slug}', [HomeController::class, 'showPost'])->name('blog.show
 Route::get('/topic/{slug}', [HomeController::class, 'topic'])->name('blog.topic');
 
 // Feature-Flagged Routes
-Route::get('/tournaments', function () {
-    return view('tournaments');
-});
+// Tournaments routes
+Route::get('/tournaments', [App\Http\Controllers\TreeController::class, 'index'])->name('tournaments.index');
+Route::post('/tournaments', [App\Http\Controllers\TreeController::class, 'store'])->name('tournaments.store');
+Route::put('/tournaments/{championship}', [App\Http\Controllers\TreeController::class, 'update'])->name('tournaments.update');
 
 // Resource Routes
 Route::resource('players', PlayerController::class);

@@ -4,32 +4,28 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Xoco70\LaravelTournaments\DBHelpers;
 
 class LaravelTournamentSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
         Model::unguard();
 
-        $this->command->info('Seeding...');
+        $this->command->info('Seeding tournament data...');
 
-        DBHelpers::setFKCheckOff();
+        $this->call([
+            VenueSeeder::class,
+            CategorySeeder::class,
+            TournamentSeeder::class,
+            CompetitorSeeder::class,
+        ]);
 
-        DB::table('competitor')->truncate();
-        DB::table('tournament')->truncate();
-        DB::table('category')->truncate();
-        DB::table('users')->truncate();
-        DB::table('venue')->truncate();
-
-        $this->call(VenueSeeder::class);
-        $this->call(CategorySeeder::class);
-        $this->call(TournamentSeeder::class);
-        $this->call(CompetitorSeeder::class);
-
-        $this->command->info('All tables seeded!');
-        DBHelpers::setFKCheckOn();
+        $this->command->info('Tournament tables seeded!');
         Model::reguard();
     }
 }

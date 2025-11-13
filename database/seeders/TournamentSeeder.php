@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 use Xoco70\LaravelTournaments\Models\Championship;
 use Xoco70\LaravelTournaments\Models\Tournament;
 use Xoco70\LaravelTournaments\Models\Venue;
@@ -16,29 +18,47 @@ class TournamentSeeder extends Seeder
      */
     public function run()
     {
-        $venues = Venue::all()->pluck('id')->toArray();
+        $venue = Venue::first();
 
-        Tournament::truncate();
-        $faker = \Faker\Factory::create();
-        $dateIni = $faker->dateTimeBetween('now', '+2 weeks')->format('Y-m-d');
+        // Get an existing user or create one
+        $user = User::first();
+        if (!$user) {
+            $user = User::factory()->create();
+        }
 
-        Tournament::create([
-            'id'                => 1,
-            'slug'              => md5(uniqid(rand(), true)),
-            'user_id'           => 1,
-            'name'              => 'Test Tournament',
-            'dateIni'           => $dateIni,
-            'dateFin'           => $dateIni,
-            'registerDateLimit' => $dateIni,
-            'sport'             => 1,
-            'type'              => 0,
-            'level_id'          => 7,
-            'venue_id'          => $faker->randomElement($venues),
+        // Check if tournament already exists
+        $tournament = Tournament::where('name', 'Demo Tournament')->first();
 
-        ]);
+        if (!$tournament) {
+            Tournament::create([
+                'name' => 'Demo Tournament',
+                'slug' => Str::slug('Demo Tournament'),
+                'dateIni' => now(),
+                'dateFin' => now()->addDays(3),
+                'level_id' => 1,
+                'type' => 1,
+                'venue_id' => $venue->id,
+                'user_id' => $user->id,
+            ]);
+        }
 
-        Championship::truncate();
-        factory(Championship::class)->create(['tournament_id' => 1, 'category_id' => 1]);
-        factory(Championship::class)->create(['tournament_id' => 1, 'category_id' => 2]);
+        // Get categories
+        $individualCategory = \Xoco70\LaravelTournaments\Models\Category::where('name', 'Individual')->first();
+        $teamCategory = \Xoco70\LaravelTournaments\Models\Category::where('name', 'Team')->first();
+
+        // Create championships if they don't exist
+        if ($tournament && $individualCategory) {
+            Championship::firstOrCreate([
+                'tournament_id' => $tournament->id,
+                'category_id' => $individualCategory->id,
+            ]);
+        }
+
+        if ($tournament && $teamCategory) {
+            Championship::firstOrCreate([
+                'tournament_id' => $tournament->id,
+                'category_id' => $teamCategory->id,
+            ]);
+        }
     }
 }
