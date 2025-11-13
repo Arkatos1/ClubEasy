@@ -111,10 +111,6 @@ class TreeController extends Controller
         'name' => ($isTeam ? 'Team' : 'Individual') . ' Championship'
     ]);
 
-    // DEBUG: Check if championship was created successfully
-    \Log::info("Championship ID: " . $championship->id);
-    \Log::info("Is Team: " . $isTeam);
-
     if ($isTeam) {
         // Create teams
         for ($i = 1; $i <= $numFighters; $i++) {
@@ -142,9 +138,6 @@ class TreeController extends Controller
             $availableUsers = $availableUsers->merge($newUsers);
         }
 
-        // DEBUG: Log before creating competitors
-        \Log::info("Creating " . $availableUsers->count() . " competitors for championship ID: " . $championship->id);
-
         // Create competitors - use the correct approach
         foreach ($availableUsers as $index => $user) {
             $competitor = new Competitor();
@@ -154,8 +147,6 @@ class TreeController extends Controller
             $competitor->short_id = $index + 1;
             $competitor->save();
 
-            // DEBUG: Log success
-            \Log::info("Created competitor ID: " . $competitor->id . " for championship ID: " . $championship->id);
         }
     }
 
