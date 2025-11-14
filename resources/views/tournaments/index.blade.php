@@ -3,8 +3,6 @@
 @section('title', 'Tournaments')
 
 @section('template_linked_css')
-<!-- Bootstrap for Tournament Forms Only -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
 
 <style>
 /* TOURNAMENT BRACKET STYLES - FROM DEMO + IMPROVEMENTS */
