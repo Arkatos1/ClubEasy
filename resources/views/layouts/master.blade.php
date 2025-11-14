@@ -3,14 +3,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sports Club App</title>
+    <title>Sports Club App - @yield('title', 'Home')</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-    <!-- Styles -->
+    <!-- Tailwind Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @yield('template_linked_css')
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
     <!-- Banner -->
@@ -21,14 +23,14 @@
     <!-- Navigation -->
     @include('layouts.navigation')
 
-    <!-- Main Content - This will grow to push footer down -->
+    <!-- Main Content -->
     <main class="flex-1">
-        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            @yield('content')
-        </div>
+        @yield('content')
     </main>
 
     <!-- Footer -->
     @include('layouts.footer')
+
+    @yield('template_scripts')
 </body>
 </html>
