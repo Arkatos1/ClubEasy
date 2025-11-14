@@ -249,7 +249,6 @@
                 </form>
             </div>
 
-
             <!-- Tournament Display -->
             @if($tournament && $tournament->championships->count() > 0)
                 @foreach($tournament->championships as $championship)
