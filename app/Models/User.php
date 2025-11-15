@@ -53,4 +53,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Competitor::class, 'user_id');
     }
+
+    /**
+     * Check if user has membership
+     */
+    public function hasMembership()
+    {
+        return $this->hasRole('member');
+    }
 }

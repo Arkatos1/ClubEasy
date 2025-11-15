@@ -6,7 +6,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\CalendarController; // Add this line
+use App\Http\Controllers\CalendarController;
+use Modules\Membership\Http\Controllers\MembershipController;
 
 // Public Routes - Home page IS the blog
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -58,7 +59,7 @@ Route::middleware('auth')->group(function () {
 
 // Membership Routes
 Route::middleware(['auth', 'verified'])->prefix('membership')->name('membership.')->group(function () {
-    Route::get('/', function () { return view('membership::index'); })->name('index');
+    Route::get('/', [MembershipController::class, 'index'])->name('index');
     Route::get('/plans', function () { return view('membership::plans'); })->name('plans');
     Route::get('/status', function () { return view('membership::status'); })->name('status');
     Route::post('/subscribe', function () { return redirect()->route('membership.status')->with('success', 'Updated!'); })->name('subscribe');
@@ -121,4 +122,9 @@ Route::prefix('canvas-ui')->group(function () {
     Route::get('/{view?}', [\App\Http\Controllers\CanvasUiController::class, 'index'])
          ->where('view', '(.*)')
          ->name('canvas-ui');
+});
+
+Route::middleware(['auth', 'verified'])->prefix('membership')->name('membership.')->group(function () {
+    Route::post('/join', [\Modules\Membership\Http\Controllers\MembershipController::class, 'join'])->name('join');
+    Route::delete('/leave', [\Modules\Membership\Http\Controllers\MembershipController::class, 'leave'])->name('leave');
 });

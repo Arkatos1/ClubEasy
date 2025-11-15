@@ -11,8 +11,6 @@ class MembershipServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Log::info('MembershipServiceProvider booting...');
-        \Log::info('Views path: ' . module_path('Membership', 'resources/views'));
 
         $this->registerConfig();
         $this->registerViews();

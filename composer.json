@@ -9,7 +9,6 @@
         "php": "^8.2",
         "ably/ably-php": "*",
         "austintoddj/canvas": "^6.0",
-        "ccharz/laravel-epc-qr": "^3.0",
         "jeremykenedy/laravel-roles": "^11.5",
         "jeremykenedy/laravel-users": "^4.5",
         "jobmetric/laravel-membership": "^1.3",
@@ -20,6 +19,7 @@
         "open-admin-ext/media-manager": "^1.0",
         "open-admin-org/open-admin": "^1.0",
         "pusher/pusher-php-server": "*",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "xoco70/laravel-tournaments": "^0.17.0"
     },
     "require-dev": {
