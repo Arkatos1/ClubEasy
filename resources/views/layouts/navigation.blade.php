@@ -4,10 +4,10 @@
             <!-- Tabs -->
             <div class="flex space-x-8">
                 <a href="{{ url('/') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('/') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Home</a>
-                <a href="{{ url('/players') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('players') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Players</a>
                 <a href="{{ url('/matches') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('matches') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Matches</a>
                 <a href="{{ url('/results') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('results') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Results</a>
                 <a href="{{ url('/tournaments') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('tournaments') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Tournaments</a>
+                <a href="{{ url('/calendar') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('players') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Calendar</a>
                 <a href="{{ url('/about') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('about') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">About Us</a>
 
                 @auth

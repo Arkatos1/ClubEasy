@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CalendarController; // Add this line
 
 // Public Routes - Home page IS the blog
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -35,6 +36,14 @@ Route::get('/results', function () {
 Route::get('/about', function () {
     return view('pages.about');
 });
+
+// Calendar Page
+Route::get('/calendar', function () {
+    return view('calendar');
+});
+
+// Calendar API Route (added to web.php since you don't have api.php)
+Route::get('/api/calendar-events', [CalendarController::class, 'index']);
 
 // Auth Protected Routes
 Route::middleware(['auth', 'verified'])->group(function () {
