@@ -19,6 +19,13 @@
                     </div>
                 @endif
 
+                <!-- QR Format Validation -->
+                @if(isset($isValidFormat) && !$isValidFormat)
+                    <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+                        ⚠️ QR code format validation failed. Using test IBAN from Czech specification.
+                    </div>
+                @endif
+
                 <!-- Membership Status -->
                 <div class="bg-gray-50 p-6 rounded-lg mb-6">
                     <h2 class="text-xl font-semibold mb-4">Your Membership Status</h2>
@@ -76,6 +83,17 @@
                         <p class="text-gray-600">Access to advanced training resources</p>
                     </div>
                 </div>
+
+                <!-- Debug Information (hidden by default) -->
+                <details class="mt-8 text-sm">
+                    <summary class="cursor-pointer text-gray-500 hover:text-gray-700">🔧 Debug QR Code Information</summary>
+                    <div class="mt-2 p-4 bg-gray-100 rounded-lg">
+                        <p class="font-mono text-xs break-all"><strong>QR Data:</strong> {{ $qrData ?? 'No data' }}</p>
+                        <p class="mt-2"><strong>Format Valid:</strong> {{ $isValidFormat ? 'Yes' : 'No' }}</p>
+                        <p><strong>Test IBAN:</strong> CZ5855000000001265098001 (from official specification)</p>
+                        <p class="mt-2 text-green-600">✅ Using official test data from Czech QR Platba specification</p>
+                    </div>
+                </details>
             </div>
         </div>
     </div>
@@ -88,35 +106,66 @@
             <h3 class="text-lg font-medium text-gray-900">Become a Member</h3>
 
             <!-- QR Code Payment Section -->
-        <div class="mt-4">
-            <p class="text-sm text-gray-500 mb-4">Scan the QR code to complete your membership payment</p>
+            <div class="mt-4">
+                <p class="text-sm text-gray-500 mb-4">Scan the QR code to complete your membership payment</p>
 
-            <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
-                <!-- QR Code will be generated here -->
-                <div id="qrCodeContainer" class="flex justify-center">
-                    @if(isset($qrCode) && $qrCode)
-                        <div class="text-center">
-                            {!! $qrCode !!}
-                            <p class="text-xs text-gray-500 mt-2">Scan to simulate payment</p>
-                        </div>
-                    @else
-                        <div class="text-center p-4">
-                            <div class="bg-gray-200 w-48 h-48 flex items-center justify-center mx-auto mb-2 rounded">
-                                <span class="text-gray-500 text-sm">QR Code Error</span>
+                <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+                    <!-- QR Code will be generated here -->
+                    <div id="qrCodeContainer" class="flex justify-center">
+                        @if(isset($qrCode) && $qrCode)
+                            <div class="text-center">
+                                {!! $qrCode !!}
+                                <p class="text-xs text-gray-500 mt-2">Scan to simulate payment</p>
                             </div>
-                            <p class="text-sm text-gray-600">QR code failed to generate</p>
-                        </div>
-                    @endif
+                        @else
+                            <div class="text-center p-4">
+                                <div class="bg-gray-200 w-48 h-48 flex items-center justify-center mx-auto mb-2 rounded">
+                                    <span class="text-gray-500 text-sm">QR Code Error</span>
+                                </div>
+                                <p class="text-sm text-gray-600">QR code failed to generate</p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
-            </div>
 
-            <div class="text-left bg-gray-50 p-4 rounded-lg mb-4">
-                <h4 class="font-semibold text-sm mb-2">Payment Details:</h4>
-                <p class="text-xs text-gray-600">Amount: 0.00 EUR (Testing)</p>
-                <p class="text-xs text-gray-600">Beneficiary: Sports Club</p>
-                <p class="text-xs text-gray-600">Reference: {{ $paymentReference ?? 'N/A' }}</p>
+                <div class="text-left bg-gray-50 p-4 rounded-lg mb-4">
+                    <h4 class="font-semibold text-sm mb-2">Payment Details:</h4>
+                    <p class="text-xs text-gray-600">Amount: <span class="font-mono">{{ $amount ?? '500.00' }} {{ $currency ?? 'CZK' }}</span></p>
+                    <p class="text-xs text-gray-600">Beneficiary: <span class="font-semibold">{{ $beneficiary ?? 'Sports Club s.r.o.' }}</span></p>
+                    <p class="text-xs text-gray-600">Account: <span class="font-mono select-all">{{ $account ?? 'CZ58 5500 0000 0012 6509 8001' }}</span></p>
+                    <p class="text-xs text-gray-600">Bank: <span class="font-mono">{{ $bank ?? 'Airbank' }}</span></p>
+                    <p class="text-xs text-gray-600 font-mono">Variable Symbol: {{ $paymentReference ?? 'N/A' }}</p>
+
+                    <div class="mt-3 p-2 bg-green-50 rounded border border-green-200">
+                        <p class="text-xs text-green-700 font-semibold mb-1">✅ Using Official Test Data</p>
+                        <p class="text-xs text-green-600">
+                            <strong>Test IBAN:</strong> From Czech QR Platba specification
+                        </p>
+                        <p class="text-xs text-green-600 mt-1">
+                            <strong>Scan with:</strong> Any Czech banking app (AirBank, ČSOB, KB, etc.)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Payment Confirmation Button -->
+                @if(!$paymentVerified)
+                    <div class="mt-4 text-center">
+                        <p class="text-sm text-gray-600 mb-3">After making the payment:</p>
+                        <a href="/membership/confirm-payment"
+                           class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200">
+                            ✅ I've Paid - Confirm Now
+                        </a>
+                        <p class="text-xs text-gray-500 mt-2">
+                            You'll be redirected to confirm your payment and activate membership
+                        </p>
+                    </div>
+                @else
+                    <div class="mt-4 p-3 bg-green-100 border border-green-400 rounded-lg">
+                        <p class="text-green-700 font-semibold">✅ Payment Verified</p>
+                        <p class="text-green-600 text-sm">Your membership is active!</p>
+                    </div>
+                @endif
             </div>
-        </div>
 
             <div class="flex justify-between mt-4">
                 <button type="button"

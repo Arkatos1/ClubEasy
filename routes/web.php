@@ -57,12 +57,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Membership Routes
 Route::middleware(['auth', 'verified'])->prefix('membership')->name('membership.')->group(function () {
     Route::get('/', [MembershipController::class, 'index'])->name('index');
-    Route::get('/plans', function () { return view('membership::plans'); })->name('plans');
-    Route::get('/status', function () { return view('membership::status'); })->name('status');
-    Route::post('/subscribe', function () { return redirect()->route('membership.status')->with('success', 'Updated!'); })->name('subscribe');
+    Route::get('/plans', [MembershipController::class, 'plans'])->name('plans');
+    Route::get('/status', [MembershipController::class, 'status'])->name('status');
+    Route::post('/subscribe', [MembershipController::class, 'subscribe'])->name('subscribe');
+    Route::post('/join', [MembershipController::class, 'join'])->name('join');
+    Route::delete('/leave', [MembershipController::class, 'leave'])->name('leave');
+    Route::get('/confirm-payment', [MembershipController::class, 'confirmPayment'])->name('confirm-payment');
+    Route::post('/confirm-payment', [MembershipController::class, 'processConfirmation'])->name('process-confirmation');
 });
 
 // Trainer Routes
@@ -98,7 +101,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-
 require __DIR__.'/auth.php';
 
 Route::prefix('canvas-ui')->group(function () {
@@ -122,9 +124,4 @@ Route::prefix('canvas-ui')->group(function () {
     Route::get('/{view?}', [\App\Http\Controllers\CanvasUiController::class, 'index'])
          ->where('view', '(.*)')
          ->name('canvas-ui');
-});
-
-Route::middleware(['auth', 'verified'])->prefix('membership')->name('membership.')->group(function () {
-    Route::post('/join', [\Modules\Membership\Http\Controllers\MembershipController::class, 'join'])->name('join');
-    Route::delete('/leave', [\Modules\Membership\Http\Controllers\MembershipController::class, 'leave'])->name('leave');
 });
