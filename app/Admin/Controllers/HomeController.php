@@ -13,6 +13,12 @@ class HomeController extends Controller
 {
     public function index(Content $content)
     {
+
+        // Always redirect PJAX requests to dashboard to break nesting
+        if (request()->header('X-PJAX')) {
+            return response('<script>window.location.href = "'.admin_url('/').'";</script>');
+        }
+
         return $content
             ->css_file(Admin::asset("open-admin/css/pages/dashboard.css"))
             ->title('Dashboard')

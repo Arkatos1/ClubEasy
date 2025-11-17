@@ -14,15 +14,16 @@ class AdminAccess
     public function handle(Request $request, Closure $next): Response
     {
         // Allow access to login pages for everyone
-        if ($request->is(config('admin.route.prefix') . '/auth/login') ||
-            $request->is(config('admin.route.prefix') . '/auth/logout')) {
+        $path = $request->path();
+        if (strpos($path, config('admin.route.prefix') . '/auth/login') !== false ||
+            strpos($path, config('admin.route.prefix') . '/auth/logout') !== false) {
             return $next($request);
         }
 
         // Check if user is authenticated and is administrator for all other routes
         if (!auth()->check()) {
             // Redirect to Open Admin login page if not authenticated
-            return redirect()->route('admin.login');
+            return redirect(config('admin.route.prefix') . '/auth/login');
         }
 
         if (!auth()->user()->hasRole('administrator')) {

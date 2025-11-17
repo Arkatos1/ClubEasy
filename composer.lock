@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "315f4d3e91a9ae9999bc92bda5d4bd28",
+    "content-hash": "191935418c5f9b9439818fa70675fe14",
     "packages": [
         {
             "name": "ably/ably-php",
@@ -3735,6 +3735,64 @@
                 }
             ],
             "time": "2025-06-29T09:23:53+00:00"
+        },
+        {
+            "name": "open-admin-ext/config",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/open-admin-org/config.git",
+                "reference": "eeb142f5f985211f0ba28238bb1123424ea7c56c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/open-admin-org/config/zipball/eeb142f5f985211f0ba28238bb1123424ea7c56c",
+                "reference": "eeb142f5f985211f0ba28238bb1123424ea7c56c",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": ">=7.0",
+                "open-admin-org/open-admin": "~1.0",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "laravel/laravel": "~7.0",
+                "phpunit/phpunit": "~6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "OpenAdmin\\Admin\\Config\\ConfigServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OpenAdmin\\Admin\\Config\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "open-admin",
+                    "email": "infog@open-admin.org"
+                }
+            ],
+            "description": "Config extension for open-admin, thanks to z-song",
+            "homepage": "https://github.com/open-admin-ext/config",
+            "keywords": [
+                "open-admin",
+                "setting"
+            ],
+            "support": {
+                "issues": "https://github.com/open-admin-org/config/issues",
+                "source": "https://github.com/open-admin-org/config/tree/v1.0"
+            },
+            "time": "2021-07-20T17:53:21+00:00"
         },
         {
             "name": "open-admin-ext/media-manager",

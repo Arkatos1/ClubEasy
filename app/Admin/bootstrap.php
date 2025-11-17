@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Route;
 use OpenAdmin\Admin\Facades\Admin;
 
 OpenAdmin\Admin\Form::forget(['editor']);
