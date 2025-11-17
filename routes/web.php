@@ -30,6 +30,10 @@ Route::get('/matches', function () {
     return view('pages.matches');
 });
 
+Route::get('/administration', function () {
+    return view('administration');
+})->name('administration')->middleware(['auth', 'role:administrator']);
+
 Route::get('/results', function () {
     return view('pages.results');
 });
