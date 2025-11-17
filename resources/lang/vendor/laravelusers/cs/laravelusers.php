@@ -1,0 +1,81 @@
+<?php
+return [
+    'showing-all-users' => 'Zobrazení všech uživatelů',
+    'users-menu-alt' => 'Zobrazit menu správy uživatelů',
+    'create-new-user' => 'Vytvořit nového uživatele',
+    'show-deleted-users' => 'Zobrazit smazané uživatele',
+    'editing-user' => 'Úprava uživatele :name',
+    'showing-user' => 'Zobrazení uživatele :name',
+    'showing-user-title' => 'Informace o uživateli :name',
+
+    'users-table' => [
+        'caption' => '{1} celkem :userscount uživatel|[2,4] celkem :userscount uživatelé|[5,*] celkem :userscount uživatelů',
+        'id' => 'ID',
+        'name' => 'Jméno',
+        'email' => 'Email',
+        'role' => 'Role',
+        'created' => 'Vytvořeno',
+        'updated' => 'Aktualizováno',
+        'actions' => 'Akce',
+    ],
+
+    'buttons' => [
+        'create-new' => 'Nový uživatel',
+        'delete' => 'Smazat',
+        'show' => 'Zobrazit',
+        'edit' => 'Upravit',
+        'back-to-users' => 'Zpět na uživatele',
+        'back-to-user' => 'Zpět na uživatele',
+        'delete-user' => 'Smazat uživatele',
+        'edit-user' => 'Upravit uživatele',
+    ],
+
+    'tooltips' => [
+        'delete' => 'Smazat',
+        'show' => 'Zobrazit',
+        'edit' => 'Upravit',
+        'create-new' => 'Vytvořit nového uživatele',
+        'back-user' => 'Zpět na uživatele',
+        'back-users' => 'Zpět na uživatele',
+        'email-user' => 'Email :user',
+        'submit-search' => 'Odeslat vyhledávání uživatelů',
+        'clear-search' => 'Vymazat výsledky hledání',
+    ],
+
+    'messages' => [
+        'userNameTaken' => 'Uživatelské jméno je již obsazeno',
+        'userNameRequired' => 'Uživatelské jméno je povinné',
+        'userNameInvalid' => 'Uživatelské jméno je neplatné',
+        'fNameRequired' => 'Křestní jméno je povinné',
+        'lNameRequired' => 'Příjmení je povinné',
+        'emailRequired' => 'Email je povinný',
+        'emailInvalid' => 'Email je neplatný',
+        'passwordRequired' => 'Heslo je povinné',
+        'PasswordMin' => 'Heslo musí mít alespoň 6 znaků',
+        'PasswordMax' => 'Heslo může mít maximálně 20 znaků',
+        'captchaRequire' => 'Captcha je povinná',
+        'CaptchaWrong' => 'Nesprávná captcha, zkuste to prosím znovu.',
+        'roleRequired' => 'Uživatelská role je povinná.',
+        'user-creation-success' => 'Uživatel byl úspěšně vytvořen!',
+        'update-user-success' => 'Uživatel byl úspěšně aktualizován!',
+        'delete-success' => 'Uživatel byl úspěšně smazán!',
+        'cannot-delete-yourself' => 'Nemůžete smazat sami sebe!',
+    ],
+
+    'show-user' => [
+        'id' => 'ID uživatele',
+        'name' => 'Uživatelské jméno',
+        'email' => 'Email uživatele',
+        'role' => 'Uživatelská role',
+        'created' => 'Vytvořeno',
+        'updated' => 'Aktualizováno',
+        'labelRole' => 'Uživatelská role',
+        'labelAccessLevel' => 'Úroveň přístupu uživatele',
+    ],
+
+    'search' => [
+        'title' => 'Zobrazení výsledků hledání',
+        'found-footer' => ' nalezených záznamů',
+        'no-results' => 'Žádné výsledky',
+    ],
+];
