@@ -17,6 +17,7 @@
         "laravel/tinker": "^2.10.1",
         "nwidart/laravel-modules": "^12.0",
         "open-admin-ext/config": "^1.0",
+        "open-admin-ext/helpers": "^1.0",
         "open-admin-ext/media-manager": "^1.0",
         "open-admin-org/open-admin": "^1.0",
         "pusher/pusher-php-server": "*",

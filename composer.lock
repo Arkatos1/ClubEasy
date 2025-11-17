@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "191935418c5f9b9439818fa70675fe14",
+    "content-hash": "2bbbc0e1d3c8acd8e6f0e1ce7e043273",
     "packages": [
         {
             "name": "ably/ably-php",
@@ -3793,6 +3793,59 @@
                 "source": "https://github.com/open-admin-org/config/tree/v1.0"
             },
             "time": "2021-07-20T17:53:21+00:00"
+        },
+        {
+            "name": "open-admin-ext/helpers",
+            "version": "V1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/open-admin-org/helpers.git",
+                "reference": "d80f62875e5deb6a40bde149a92f0666c7642683"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/open-admin-org/helpers/zipball/d80f62875e5deb6a40bde149a92f0666c7642683",
+                "reference": "d80f62875e5deb6a40bde149a92f0666c7642683",
+                "shasum": ""
+            },
+            "require": {
+                "open-admin-org/open-admin": "~1.0",
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "OpenAdmin\\Admin\\Helpers\\HelpersServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OpenAdmin\\Admin\\Helpers\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "open-admin",
+                    "email": "info@open-admin.org"
+                }
+            ],
+            "description": "Helpers extension for open-admin",
+            "homepage": "https://github.com/open-admin-org/helpers",
+            "keywords": [
+                "helpers",
+                "open-admin"
+            ],
+            "support": {
+                "issues": "https://github.com/open-admin-org/helpers/issues",
+                "source": "https://github.com/open-admin-org/helpers/tree/V1.0.4"
+            },
+            "time": "2024-10-02T13:53:36+00:00"
         },
         {
             "name": "open-admin-ext/media-manager",
