@@ -112,19 +112,18 @@ return [
 
         'controller' => App\Admin\Controllers\AuthController::class,
 
-        'guard' => 'admin',
-
+        'guard' => 'web', // Use our admin guard
         'guards' => [
             'admin' => [
                 'driver'   => 'session',
-                'provider' => 'admin',
+                'provider' => 'users', // Use main users
             ],
         ],
 
         'providers' => [
             'admin' => [
                 'driver' => 'eloquent',
-                'model'  => OpenAdmin\Admin\Auth\Database\Administrator::class,
+                'model'  => App\Models\User::class, // Use main User model
             ],
         ],
 
@@ -181,8 +180,8 @@ return [
         'connection' => env('DB_CONNECTION', 'mysql'),
 
         // User tables and model.
-        'users_table' => 'admin_users',
-        'users_model' => OpenAdmin\Admin\Auth\Database\Administrator::class,
+        'users_table' => 'users',
+        'users_model' => App\Models\User::class,
 
         // Role table and model.
         'roles_table' => 'admin_roles',
@@ -246,14 +245,14 @@ return [
     | Indicates whether to check route permission.
     |--------------------------------------------------------------------------
     */
-    'check_route_permission' => true,
+    'check_route_permission' => false,
 
     /*
     |--------------------------------------------------------------------------
     | Indicates whether to check menu roles.
     |--------------------------------------------------------------------------
     */
-    'check_menu_roles' => true,
+    'check_menu_roles' => false,
 
     /*
     |--------------------------------------------------------------------------

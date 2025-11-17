@@ -10,15 +10,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\View\View;
-use jeremykenedy\LaravelRoles\Models\Role;
+use Illuminate\Routing\Redirector; // Add this import
+use jeremykenedy\LaravelRoles\Models\Role; // Add this import
 
 class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create()
     {
         return view('auth.register');
     }
@@ -31,26 +31,48 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'gdpr_consent' => ['required', 'accepted'],
         ]);
 
+        // Generate unique username
+        $baseUsername = $request->first_name . ' ' . $request->last_name;
+        $username = $this->generateUniqueUsername($baseUsername);
+
         $user = User::create([
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
+            'username' => $username,
             'password' => Hash::make($request->password),
         ]);
 
-        $playerRole = Role::where('slug', 'player')->first();
-        if ($playerRole) {
-            $user->attachRole($playerRole);
+        // Assign default 'user' role
+        $userRole = Role::where('slug', 'user')->first();
+        if ($userRole) {
+            $user->attachRole($userRole);
         }
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect('/dashboard'); // Use direct path instead of RouteServiceProvider
+    }
+
+    protected function generateUniqueUsername($baseUsername)
+    {
+        $username = $baseUsername;
+        $counter = 1;
+
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . ' ' . $counter;
+            $counter++;
+        }
+
+        return $username;
     }
 }

@@ -18,26 +18,24 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
+        'username',
         'password',
+        'avatar',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    public function getNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -46,19 +44,53 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get the competitors for the user.
-     */
     public function competitors()
     {
         return $this->hasMany(Competitor::class, 'user_id');
     }
 
-    /**
-     * Check if user has membership
-     */
     public function hasMembership()
     {
         return $this->hasRole('member');
+    }
+
+        /**
+         * Check if user is administrator for Open Admin
+         */
+        public function isAdministrator()
+        {
+            return $this->hasRole('administrator');
+        }
+    /**
+     * Open Admin required methods - proper implementation
+     */
+    public function visible($roles)
+    {
+        // Only administrators can see Open Admin menus
+        return $this->isAdministrator();
+    }
+
+    public function inRoles($roles = [])
+    {
+        // Only administrators have Open Admin roles
+        return $this->isAdministrator();
+    }
+
+    public function can($abilities, $arguments = [])
+    {
+        // Only administrators can do anything in Open Admin
+        return $this->isAdministrator();
+    }
+
+    public function cannot($abilities, $arguments = [])
+    {
+        // Non-administrators cannot do anything in Open Admin
+        return !$this->isAdministrator();
+    }
+
+    public function allPermissions()
+    {
+        // Only administrators have permissions in Open Admin
+        return $this->isAdministrator() ? collect(['*']) : collect();
     }
 }
