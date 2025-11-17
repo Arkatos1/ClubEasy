@@ -93,4 +93,36 @@ class User extends Authenticatable
         // Only administrators have permissions in Open Admin
         return $this->isAdministrator() ? collect(['*']) : collect();
     }
+
+    public function getRoleAttribute()
+    {
+        // Map your roles to Canvas roles
+        if ($this->hasRole('administrator')) {
+            return 3; // Canvas admin
+        }
+        if ($this->hasRole('editor')) {
+            return 2; // Canvas editor
+        }
+        return 1; // Canvas contributor
+    }
+
+    public function getIsAdminAttribute()
+    {
+        return $this->hasRole('administrator');
+    }
+
+    public function getIsEditorAttribute()
+    {
+        return $this->hasRole('administrator') || $this->hasRole('editor');
+    }
+
+    public function getIsContributorAttribute()
+    {
+        // Anyone with access is a contributor
+        return $this->hasRole('administrator') || $this->hasRole('editor') || $this->hasRole('contributor');
+    }
+    public function getDefaultAvatarAttribute()
+    {
+        return 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?d=identicon';
+    }
 }

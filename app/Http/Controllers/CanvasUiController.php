@@ -23,7 +23,7 @@ class CanvasUiController extends Controller
         return view('canvas-ui')->with([
             'config' => [
                 'canvasPath' => config('canvas.path'),
-                'user' => $request->user('canvas'),
+                'user' => $request->user(),
                 'timezone' => config('app.timezone'),
                 // Add vite assets instead of mix
                 'assets' => [

@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'users', // Use same users provider
         ],
+        'canvas' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
     ],
 
     /*
