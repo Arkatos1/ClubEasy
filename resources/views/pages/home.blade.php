@@ -1,5 +1,7 @@
 @extends('layouts.master')
 
+@section('title', __('Home'))
+
 @section('content')
 <div class="px-4 py-6">
     <!-- News & Blog Section -->
@@ -30,9 +32,8 @@
 
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>📅 {{ $featuredPost->published_at->format('F j, Y') }}</span>
-                        <span>⏱️ {{ round(str_word_count(strip_tags($featuredPost->body)) / 200) }} min read</span>
-                    </div>
+                        <span>📅 {{ $featuredPost->published_at->translatedFormat('F j, Y') }}</span>
+                        <span>⏱️ {{ max(1, round(str_word_count(strip_tags($featuredPost->body)) / 200)) }} {{ __('min read') }}</span>                    </div>
                     <a href="{{ route('blog.show', $featuredPost->slug) }}"
                        class="bg-gradient-to-r from-blue-600 to-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
                         {{ __('Read Full Story') }}
@@ -102,7 +103,7 @@
 
                                 <div class="flex items-center justify-between text-xs text-gray-500">
                                     <div class="flex items-center space-x-3">
-                                        <span>{{ $post->published_at->format('M j') }}</span>
+                                        <span>{{ $post->published_at->translatedFormat('M j') }}</span>
                                     </div>
                                     <a href="{{ route('blog.show', $post->slug) }}" class="text-blue-600 hover:text-blue-800 font-medium">
                                         {{ __('Read') }} →
@@ -140,7 +141,7 @@
                                 {{ $post->title }}
                             </h4>
                             <div class="flex items-center text-xs text-gray-500">
-                                <span>{{ $post->published_at->format('M j') }}</span>
+                                <span>{{ $post->published_at->translatedFormat('M j') }}</span>
                             </div>
                         </a>
                         @endforeach

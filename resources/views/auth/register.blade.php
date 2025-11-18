@@ -48,7 +48,7 @@
                 <input type="checkbox" name="gdpr_consent" required
                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
                 <span class="ms-2 text-sm text-gray-600">
-                    I agree to the storage and processing of my personal data in accordance with GDPR
+                    {{ __('I agree to the storage and processing of my personal data in accordance with GDPR') }}
                 </span>
             </label>
             <x-input-error :messages="$errors->get('gdpr_consent')" class="mt-2" />

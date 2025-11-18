@@ -26,8 +26,8 @@ Route::put('/tournaments/{championship}', [App\Http\Controllers\TreeController::
 Route::resource('players', PlayerController::class);
 
 // Navigation Pages
-Route::get('/matches', function () {
-    return view('pages.matches');
+Route::get('/sports', function () {
+    return view('pages.sports');
 });
 
 Route::get('/administration', function () {
@@ -52,7 +52,7 @@ Route::get('/api/calendar-events', [CalendarController::class, 'index']);
 
 // Auth Protected Routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/myprofile', [DashboardController::class, 'index'])->name('myprofile');
 });
 
 Route::middleware('auth')->group(function () {

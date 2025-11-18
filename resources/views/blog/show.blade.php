@@ -1,5 +1,7 @@
 @extends('layouts.master')
 
+@section('title', $post->title)
+
 @section('content')
 <div class="max-w-4xl mx-auto px-4 py-8">
     <article class="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -10,7 +12,7 @@
             <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ $post->title }}</h1>
 
             <div class="flex items-center text-sm text-gray-500 mb-6">
-                <span>Published on: {{ $post->published_at->format('F j, Y') }}</span>
+                <span>{{ __('Published on') }}: {{ $post->published_at->translatedFormat('F j, Y') }}</span>
                 @if($post->topic->isNotEmpty())
                 <span class="mx-2">•</span>
                 <span class="bg-gray-100 px-2 py-1 rounded">{{ $post->topic->first()->name }}</span>
@@ -23,7 +25,7 @@
 
             @if($post->tags->count() > 0)
             <div class="border-t pt-6">
-                <h4 class="text-sm font-semibold text-gray-900 mb-2">Tags:</h4>
+                <h4 class="text-sm font-semibold text-gray-900 mb-2">{{ __('Tags') }}:</h4>
                 <div class="flex flex-wrap gap-2">
                     @foreach($post->tags as $tag)
                     <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
@@ -39,7 +41,7 @@
     <!-- Related Posts -->
     @if($relatedPosts->count() > 0)
     <div class="mt-12">
-        <h3 class="text-2xl font-bold text-gray-900 mb-6">Related Posts</h3>
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Related Posts') }}</h3>
         <div class="grid gap-6 md:grid-cols-3">
             @foreach($relatedPosts as $relatedPost)
             <div class="bg-white rounded-lg shadow-md p-4">
@@ -48,17 +50,17 @@
                         {{ $relatedPost->title }}
                     </a>
                 </h4>
-                <p class="text-gray-600 text-sm">{{ $relatedPost->published_at->format('M j, Y') }}</p>
+                <p class="text-gray-600 text-sm">{{ $relatedPost->published_at->translatedFormat('M j, Y') }}</p>
             </div>
             @endforeach
         </div>
     </div>
     @endif
 
-    <!-- Back to Blog -->
+    <!-- Back to Home -->
     <div class="mt-8 text-center">
         <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-800 font-medium">
-            ← Back to Home
+            ← {{ __('Back to Home') }}
         </a>
     </div>
 </div>

@@ -1,10 +1,12 @@
 @extends('layouts.master')
 
+@section('title', __('Topic: :name', ['name' => $topic->name]))
+
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-8">
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Topic: {{ $topic->name }}</h1>
-        <p class="text-gray-600">{{ $posts->total() }} posts in this category</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('Topic: :name', ['name' => $topic->name]) }}</h1>
+        <p class="text-gray-600">{{ trans_choice(':count post in this category|:count posts in this category', $posts->total(), ['count' => $posts->total()]) }}</p>
     </div>
 
     <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -24,7 +26,7 @@
                 </p>
                 <div class="flex justify-between items-center text-xs text-gray-500">
                     <span>{{ $post->published_at->format('M j, Y') }}</span>
-                    <span>{{ $post->view_count }} views</span>
+                    <span>{{ trans_choice(':count view|:count views', $post->view_count, ['count' => $post->view_count]) }}</span>
                 </div>
             </div>
         </article>
