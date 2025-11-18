@@ -12,27 +12,19 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        // Featured post (latest published) - eager load relationships
-        $featuredPost = Post::published()
-                           ->with(['topic', 'user', 'tags'])
-                           ->orderBy('published_at', 'desc')
-                           ->first();
-
-        // Recent posts (excluding featured) - eager load relationships
-        $recentPosts = Post::published()
-                          ->with(['topic', 'user', 'tags'])
-                          ->where('id', '!=', $featuredPost->id ?? null)
-                          ->orderBy('published_at', 'desc')
-                          ->take(6)
-                          ->get();
+        // All posts with pagination - eager load relationships
+        $posts = Post::published()
+                    ->with(['topic', 'user', 'tags'])
+                    ->orderBy('published_at', 'desc')
+                    ->paginate(4);
 
         // Popular posts - eager load relationships
         $popularPosts = Post::published()
-                           ->with(['topic', 'user', 'tags'])
-                           ->withCount('views')
-                           ->orderBy('views_count', 'desc')
-                           ->take(3)
-                           ->get();
+                        ->with(['topic', 'user', 'tags'])
+                        ->withCount('views')
+                        ->orderBy('views_count', 'desc')
+                        ->take(10)
+                        ->get();
 
         // If we need to handle the case where withCount doesn't work, we can use a raw query
         if ($popularPosts->isEmpty()) {
@@ -42,7 +34,7 @@ class HomeController extends Controller
                                ->sortByDesc(function($post) {
                                    return $post->views()->count();
                                })
-                               ->take(3);
+                               ->take(5);
         }
 
         // Topics for filtering
@@ -52,8 +44,7 @@ class HomeController extends Controller
         $latestTopics = Topic::latest()->take(5)->get();
 
         return view('pages.home', compact(
-            'featuredPost',
-            'recentPosts',
+            'posts',
             'popularPosts',
             'topics',
             'latestTopics'
@@ -100,8 +91,8 @@ class HomeController extends Controller
                         $query->where('id', $topic->id);
                     })
                     ->orderBy('published_at', 'desc')
-                    ->paginate(10);
+                    ->paginate(9);
 
-        return view('blog.topic', compact('topic', $posts));
+        return view('blog.topic', compact('topic', 'posts'));
     }
 }

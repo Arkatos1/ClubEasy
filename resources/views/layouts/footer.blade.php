@@ -9,8 +9,8 @@
                 <h3 class="text-lg font-semibold mb-4">{{ __('Quick Links') }}</h3>
                 <ul class="space-y-2">
                     <li><a href="/" class="text-gray-300 hover:text-white">{{ __('Home') }}</a></li>
-                    <li><a href="/players" class="text-gray-300 hover:text-white">{{ __('Players') }}</a></li>
                     <li><a href="/sports" class="text-gray-300 hover:text-white">{{ __('Matches') }}</a></li>
+                    <li><a href="/about" class="text-gray-300 hover:text-white">{{ __('About Us') }}</a></li>
                 </ul>
             </div>
             <div>
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-300">
-            <p>&copy; 2024 {{ __('Sports Club') }}. {{ __('Licence') }}</p>
+            <p>2025 {{ __('Sports Club') }}. {{ __('Licence') }}</p>
         </div>
     </div>
 </footer>

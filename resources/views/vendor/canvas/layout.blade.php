@@ -43,40 +43,66 @@
 <script type="text/javascript" src="{{ mix('js/app.js', 'vendor/canvas') }}"></script>
 
 <script>
-// Add the back button next to Canvas logo immediately when header appears
+// Add the back button next to Canvas logo and keep it there during SPA navigation
+function addBackButton() {
+    const canvasLogo = document.querySelector('.navbar-brand');
+    if (canvasLogo && !document.querySelector('.back-to-app-btn')) {
+        // Create the back button
+        const backButton = document.createElement('a');
+        backButton.href = '{{ url("/administration") }}';
+        backButton.className = 'back-to-app-btn btn btn-outline-primary btn-sm ml-3';
+        backButton.innerHTML = '← Zpátky do hlavní aplikace';
+
+        // Insert the button right after the Canvas logo
+        canvasLogo.parentNode.insertBefore(backButton, canvasLogo.nextSibling);
+        return true;
+    }
+    return false;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    addBackButton();
+
     const observer = new MutationObserver(function(mutations) {
-        const canvasLogo = document.querySelector('.navbar-brand');
-        if (canvasLogo && !document.querySelector('.back-to-app-btn')) {
-            // Create the back button
-            const backButton = document.createElement('a');
-            backButton.href = '{{ url("/administration") }}';
-            backButton.className = 'back-to-app-btn btn btn-outline-primary btn-sm ml-3';
-            backButton.innerHTML = '← Zpátky do hlavní aplikace';
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList') {
+                const navbarBrand = document.querySelector('.navbar-brand');
+                const existingButton = document.querySelector('.back-to-app-btn');
 
-            // Insert the button right after the Canvas logo
-            canvasLogo.parentNode.insertBefore(backButton, canvasLogo.nextSibling);
-
-            // Stop observing once we've added the button
-            observer.disconnect();
-        }
+                if (navbarBrand && !existingButton) {
+                    addBackButton();
+                }
+            }
+        });
     });
 
-    // Start observing the document for changes
     observer.observe(document.body, {
         childList: true,
         subtree: true
     });
 
-    // Also try immediately in case header is already there
-    const canvasLogo = document.querySelector('.navbar-brand');
-    if (canvasLogo && !document.querySelector('.back-to-app-btn')) {
-        const backButton = document.createElement('a');
-        backButton.href = '{{ url("/administration") }}';
-        backButton.className = 'back-to-app-btn btn btn-outline-primary btn-sm ml-3';
-        backButton.innerHTML = '← Zpátky do hlavní aplikace';
-        canvasLogo.parentNode.insertBefore(backButton, canvasLogo.nextSibling);
+    if (window.Canvas && window.Canvas.app) {
+        const originalPush = window.history.pushState;
+        window.history.pushState = function() {
+            originalPush.apply(this, arguments);
+            setTimeout(addBackButton, 100);
+        };
+
+        const originalReplace = window.history.replaceState;
+        window.history.replaceState = function() {
+            originalReplace.apply(this, arguments);
+            setTimeout(addBackButton, 100);
+        };
     }
+
+    setInterval(function() {
+        const navbarBrand = document.querySelector('.navbar-brand');
+        const existingButton = document.querySelector('.back-to-app-btn');
+
+        if (navbarBrand && !existingButton) {
+            addBackButton();
+        }
+    }, 1000);
 });
 </script>
 </body>

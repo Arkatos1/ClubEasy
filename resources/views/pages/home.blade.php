@@ -6,52 +6,6 @@
 <div class="px-4 py-6">
     <!-- News & Blog Section -->
     <div class="max-w-7xl mx-auto">
-        <!-- Featured Post (Canvas UI-style) -->
-        @if(isset($featuredPost) && $featuredPost)
-        <div class="bg-white rounded-xl shadow-2xl overflow-hidden mb-12 transform hover:scale-[1.01] transition-transform duration-300">
-            @if($featuredPost->featured_image)
-            <img src="{{ $featuredPost->featured_image }}" alt="{{ $featuredPost->title }}"
-                 class="w-full h-96 object-cover">
-            @endif
-            <div class="p-8">
-                @if($featuredPost->topic->isNotEmpty())
-                <span class="inline-block bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-4">
-                    {{ $featuredPost->topic->first()->name }}
-                </span>
-                @endif
-
-                <h1 class="text-4xl font-bold text-gray-900 mb-4 leading-tight">
-                    <a href="{{ route('blog.show', $featuredPost->slug) }}" class="hover:text-blue-600 transition-colors">
-                        {{ $featuredPost->title }}
-                    </a>
-                </h1>
-
-                <div class="text-gray-600 mb-6 text-lg leading-relaxed">
-                    {!! Str::limit(strip_tags($featuredPost->body), 200) !!}
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>📅 {{ $featuredPost->published_at->translatedFormat('F j, Y') }}</span>
-                        <span>⏱️ {{ max(1, round(str_word_count(strip_tags($featuredPost->body)) / 200)) }} {{ __('min read') }}</span>                    </div>
-                    <a href="{{ route('blog.show', $featuredPost->slug) }}"
-                       class="bg-gradient-to-r from-blue-600 to-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
-                        {{ __('Read Full Story') }}
-                    </a>
-                </div>
-            </div>
-        </div>
-        @else
-        <div class="bg-white rounded-lg shadow-md p-12 text-center mb-12">
-            <div class="text-6xl mb-4">📝</div>
-            <h3 class="text-2xl font-bold text-gray-700 mb-4">{{ __('No Featured Posts Yet') }}</h3>
-            <p class="text-gray-600 mb-6">{{ __('Check back soon for the latest updates from our sports club!') }}</p>
-            <a href="{{ route('canvas-ui') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
-                {{ __('Write First Post') }}
-            </a>
-        </div>
-        @endif
-
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- Main Content -->
             <div class="lg:col-span-3">
@@ -70,44 +24,76 @@
                     </div>
                 </div>
 
-                <!-- Recent Posts Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
-                    @isset($recentPosts)
-                        @foreach($recentPosts as $post)
-                        <article class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-                            @if($post->featured_image)
-                            <img src="{{ $post->featured_image }}" alt="{{ $post->title }}"
-                                 class="w-full h-48 object-cover">
-                            @else
-                            <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-green-400 flex items-center justify-center">
-                                <span class="text-white text-lg font-semibold">{{ __('Sports Club') }}</span>
-                            </div>
-                            @endif
+                <!-- All Posts Grid - Full Width Cards -->
+                <div class="space-y-8 mb-12">
+                    @isset($posts)
+                        @foreach($posts as $post)
+                        @php
+                            // Convert HTML to plain text with smarter spacing
+                            $text = $post->body;
 
-                            <div class="p-6">
-                                @if($post->topic->isNotEmpty())
-                                <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium mb-3">
-                                    {{ $post->topic->first()->name }}
-                                </span>
+                            // Replace closing paragraph tags with single newline (not double)
+                            $text = str_replace('</p>', "\n", $text);
+
+                            // Replace <br> tags with single newline
+                            $text = str_replace(['<br>', '<br/>', '<br />'], "\n", $text);
+
+                            // Remove all HTML tags
+                            $text = strip_tags($text);
+
+                            // Decode HTML entities
+                            $text = html_entity_decode($text);
+
+                            // Clean up whitespace - replace multiple newlines with just one
+                            $text = preg_replace('/\n\s*\n/', "\n", $text); // Multiple blank lines → single line
+                            $text = preg_replace('/[ ]+/', ' ', $text);     // Multiple spaces → single space
+                            $text = trim($text);                            // Remove leading/trailing whitespace
+
+                            // Create preview
+                            $previewText = Str::limit($text, 250);
+                            $readingTime = max(1, round(str_word_count($text) / 200));
+                        @endphp
+                        <article class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                            <div class="flex flex-col lg:flex-row">
+                                @if($post->featured_image)
+                                <div class="lg:w-1/3">
+                                    <img src="{{ $post->featured_image }}" alt="{{ $post->title }}"
+                                         class="w-full h-64 lg:h-full object-cover">
+                                </div>
+                                @else
+                                <div class="lg:w-1/3 bg-gradient-to-br from-blue-400 to-green-400 flex items-center justify-center min-h-64">
+                                    <span class="text-white text-lg font-semibold">{{ __('Sports Club') }}</span>
+                                </div>
                                 @endif
 
-                                <h3 class="text-xl font-semibold text-gray-800 mb-3 leading-tight">
-                                    <a href="{{ route('blog.show', $post->slug) }}" class="hover:text-blue-600 transition-colors">
-                                        {{ $post->title }}
-                                    </a>
-                                </h3>
+                                <div class="lg:w-2/3 p-6 flex flex-col justify-between">
+                                    <div>
+                                        @if($post->topic->isNotEmpty())
+                                        <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mb-3">
+                                            {{ $post->topic->first()->name }}
+                                        </span>
+                                        @endif
 
-                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">
-                                    {!! Str::limit(strip_tags($post->body), 120) !!}
-                                </p>
+                                        <h3 class="text-2xl font-semibold text-gray-800 mb-4 leading-tight">
+                                            <a href="{{ route('blog.show', $post->slug) }}" class="hover:text-blue-600 transition-colors">
+                                                {{ $post->title }}
+                                            </a>
+                                        </h3>
 
-                                <div class="flex items-center justify-between text-xs text-gray-500">
-                                    <div class="flex items-center space-x-3">
-                                        <span>{{ $post->published_at->translatedFormat('M j') }}</span>
+                                        <p class="text-gray-600 text-base mb-4 line-clamp-4" style="white-space: pre-line;">
+                                            {{ $previewText }}
+                                        </p>
                                     </div>
-                                    <a href="{{ route('blog.show', $post->slug) }}" class="text-blue-600 hover:text-blue-800 font-medium">
-                                        {{ __('Read') }} →
-                                    </a>
+
+                                    <div class="flex items-center justify-between text-sm text-gray-500 mt-4">
+                                        <div class="flex items-center space-x-4">
+                                            <span>{{ $post->published_at->translatedFormat('F j, Y') }}</span>
+                                            <span>⏱️ {{ $readingTime }} {{ __('min read') }}</span>
+                                        </div>
+                                        <a href="{{ route('blog.show', $post->slug) }}" class="text-blue-600 hover:text-blue-800 font-semibold text-lg">
+                                            {{ __('Read Full Story') }} →
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -115,8 +101,40 @@
                     @endisset
                 </div>
 
+                <!-- Pagination -->
+                @isset($posts)
+                    @if($posts->hasPages())
+                    <div class="flex justify-center mt-8">
+                        <div class="flex space-x-2">
+                            <!-- Previous Page Link -->
+                            @if($posts->onFirstPage())
+                                <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed">← {{ __('Previous') }}</span>
+                            @else
+                                <a href="{{ $posts->previousPageUrl() }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">← {{ __('Previous') }}</a>
+                            @endif
+
+                            <!-- Page Numbers -->
+                            @foreach(range(1, $posts->lastPage()) as $page)
+                                @if($page == $posts->currentPage())
+                                    <span class="px-4 py-2 bg-blue-600 text-white rounded-lg">{{ $page }}</span>
+                                @else
+                                    <a href="{{ $posts->url($page) }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">{{ $page }}</a>
+                                @endif
+                            @endforeach
+
+                            <!-- Next Page Link -->
+                            @if($posts->hasMorePages())
+                                <a href="{{ $posts->nextPageUrl() }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">{{ __('Next') }} →</a>
+                            @else
+                                <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg cursor-not-allowed">{{ __('Next') }} →</span>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                @endisset
+
                 <!-- Empty State -->
-                @if((!isset($recentPosts) || $recentPosts->isEmpty()) && (!isset($featuredPost) || !$featuredPost))
+                @if((!isset($posts) || $posts->isEmpty()))
                 <div class="bg-white rounded-lg shadow-md p-12 text-center">
                     <div class="text-6xl mb-4">📝</div>
                     <h3 class="text-2xl font-bold text-gray-700 mb-4">{{ __('No News Yet') }}</h3>
@@ -128,20 +146,20 @@
                 @endif
             </div>
 
-            <!-- Sidebar -->
+            <!-- Sidebar - Top Right -->
             <div class="lg:col-span-1 space-y-8">
                 <!-- Popular Posts -->
                 @if(isset($popularPosts) && $popularPosts->count() > 0)
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">🔥 {{ __('Popular Posts') }}</h3>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">{{ __('Popular Posts') }}</h3>
                     <div class="space-y-4">
                         @foreach($popularPosts as $post)
                         <a href="{{ route('blog.show', $post->slug) }}" class="block group">
-                            <h4 class="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition-colors mb-1">
+                            <h4 class="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition-colors mb-1 leading-tight">
                                 {{ $post->title }}
                             </h4>
                             <div class="flex items-center text-xs text-gray-500">
-                                <span>{{ $post->published_at->translatedFormat('M j') }}</span>
+                                <span>{{ $post->published_at->translatedFormat('M j, Y') }}</span>
                             </div>
                         </a>
                         @endforeach
@@ -152,7 +170,7 @@
                 <!-- Topics -->
                 @if(isset($latestTopics) && $latestTopics->count() > 0)
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">📚 {{ __('Topics') }}</h3>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">{{ __('Topics') }}</h3>
                     <div class="space-y-2">
                         @foreach($latestTopics as $topic)
                         <a href="{{ route('blog.topic', $topic->slug) }}"
@@ -166,22 +184,18 @@
                     </div>
                 </div>
                 @endif
-
-                <!-- Newsletter Signup -->
-                <div class="bg-gradient-to-br from-blue-500 to-green-400 rounded-lg shadow-md p-6 text-white">
-                    <h3 class="text-lg font-bold mb-2">📬 {{ __('Stay Updated') }}</h3>
-                    <p class="text-blue-100 text-sm mb-4">{{ __('Get the latest news from our sports club delivered to your inbox.') }}</p>
-                    <form class="space-y-3">
-                        <input type="email" placeholder="{{ __('Your email address') }}"
-                               class="w-full px-3 py-2 rounded text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        <button type="submit"
-                                class="w-full bg-white text-blue-600 py-2 rounded font-semibold text-sm hover:bg-gray-100 transition-colors">
-                            {{ __('Subscribe') }}
-                        </button>
-                    </form>
-                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.line-clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: pre-line;
+}
+</style>
 @endsection
