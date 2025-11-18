@@ -35,7 +35,7 @@
                     </div>
                     <a href="{{ route('blog.show', $featuredPost->slug) }}"
                        class="bg-gradient-to-r from-blue-600 to-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
-                        Read Full Story
+                        {{ __('Read Full Story') }}
                     </a>
                 </div>
             </div>
@@ -43,10 +43,10 @@
         @else
         <div class="bg-white rounded-lg shadow-md p-12 text-center mb-12">
             <div class="text-6xl mb-4">📝</div>
-            <h3 class="text-2xl font-bold text-gray-700 mb-4">No Featured Posts Yet</h3>
-            <p class="text-gray-600 mb-6">Check back soon for the latest updates from our sports club!</p>
+            <h3 class="text-2xl font-bold text-gray-700 mb-4">{{ __('No Featured Posts Yet') }}</h3>
+            <p class="text-gray-600 mb-6">{{ __('Check back soon for the latest updates from our sports club!') }}</p>
             <a href="{{ route('canvas-ui') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
-                Write First Post
+                {{ __('Write First Post') }}
             </a>
         </div>
         @endif
@@ -56,7 +56,7 @@
             <div class="lg:col-span-3">
                 <!-- Section Header -->
                 <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900">Latest News & Updates</h2>
+                    <h2 class="text-3xl font-bold text-gray-900">{{ __('Latest News & Updates') }}</h2>
                     <div class="flex space-x-2">
                         @isset($topics)
                             @foreach($topics->take(3) as $topic)
@@ -79,7 +79,7 @@
                                  class="w-full h-48 object-cover">
                             @else
                             <div class="w-full h-48 bg-gradient-to-br from-blue-400 to-green-400 flex items-center justify-center">
-                                <span class="text-white text-lg font-semibold">Sports Club</span>
+                                <span class="text-white text-lg font-semibold">{{ __('Sports Club') }}</span>
                             </div>
                             @endif
 
@@ -105,7 +105,7 @@
                                         <span>{{ $post->published_at->format('M j') }}</span>
                                     </div>
                                     <a href="{{ route('blog.show', $post->slug) }}" class="text-blue-600 hover:text-blue-800 font-medium">
-                                        Read →
+                                        {{ __('Read') }} →
                                     </a>
                                 </div>
                             </div>
@@ -118,10 +118,10 @@
                 @if((!isset($recentPosts) || $recentPosts->isEmpty()) && (!isset($featuredPost) || !$featuredPost))
                 <div class="bg-white rounded-lg shadow-md p-12 text-center">
                     <div class="text-6xl mb-4">📝</div>
-                    <h3 class="text-2xl font-bold text-gray-700 mb-4">No News Yet</h3>
-                    <p class="text-gray-600 mb-6">Check back soon for the latest updates from our sports club!</p>
+                    <h3 class="text-2xl font-bold text-gray-700 mb-4">{{ __('No News Yet') }}</h3>
+                    <p class="text-gray-600 mb-6">{{ __('Check back soon for the latest updates from our sports club!') }}</p>
                     <a href="{{ route('canvas-ui') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
-                        Write First Post
+                        {{ __('Write First Post') }}
                     </a>
                 </div>
                 @endif
@@ -132,7 +132,7 @@
                 <!-- Popular Posts -->
                 @if(isset($popularPosts) && $popularPosts->count() > 0)
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">🔥 Popular Posts</h3>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">🔥 {{ __('Popular Posts') }}</h3>
                     <div class="space-y-4">
                         @foreach($popularPosts as $post)
                         <a href="{{ route('blog.show', $post->slug) }}" class="block group">
@@ -151,7 +151,7 @@
                 <!-- Topics -->
                 @if(isset($latestTopics) && $latestTopics->count() > 0)
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">📚 Topics</h3>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">📚 {{ __('Topics') }}</h3>
                     <div class="space-y-2">
                         @foreach($latestTopics as $topic)
                         <a href="{{ route('blog.topic', $topic->slug) }}"
@@ -168,14 +168,14 @@
 
                 <!-- Newsletter Signup -->
                 <div class="bg-gradient-to-br from-blue-500 to-green-400 rounded-lg shadow-md p-6 text-white">
-                    <h3 class="text-lg font-bold mb-2">📬 Stay Updated</h3>
-                    <p class="text-blue-100 text-sm mb-4">Get the latest news from our sports club delivered to your inbox.</p>
+                    <h3 class="text-lg font-bold mb-2">📬 {{ __('Stay Updated') }}</h3>
+                    <p class="text-blue-100 text-sm mb-4">{{ __('Get the latest news from our sports club delivered to your inbox.') }}</p>
                     <form class="space-y-3">
-                        <input type="email" placeholder="Your email address"
+                        <input type="email" placeholder="{{ __('Your email address') }}"
                                class="w-full px-3 py-2 rounded text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                         <button type="submit"
                                 class="w-full bg-white text-blue-600 py-2 rounded font-semibold text-sm hover:bg-gray-100 transition-colors">
-                            Subscribe
+                            {{ __('Subscribe') }}
                         </button>
                     </form>
                 </div>
