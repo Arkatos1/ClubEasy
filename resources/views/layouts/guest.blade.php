@@ -21,7 +21,7 @@
     <!-- Navigation -->
     @include('layouts.navigation')
 
-    <!-- Main Content - This will grow to push footer down -->
+    <!-- Main Content -->
     <main class="flex-1">
         <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div class="flex justify-center">

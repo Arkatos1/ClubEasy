@@ -9,14 +9,13 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CalendarController;
 use Modules\Membership\Http\Controllers\MembershipController;
 
-// Public Routes - Home page IS the blog
+// Public Routes - Home page
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Individual blog post routes
 Route::get('/blog/{slug}', [HomeController::class, 'showPost'])->name('blog.show');
 Route::get('/topic/{slug}', [HomeController::class, 'topic'])->name('blog.topic');
 
-// Feature-Flagged Routes
 // Tournaments routes
 Route::get('/tournaments', [App\Http\Controllers\TreeController::class, 'index'])->name('tournaments.index');
 Route::post('/tournaments', [App\Http\Controllers\TreeController::class, 'store'])->name('tournaments.store');
@@ -29,6 +28,8 @@ Route::resource('players', PlayerController::class);
 Route::get('/sports', function () {
     return view('pages.sports');
 });
+
+Route::get('/gallery', [App\Http\Controllers\GalleryController::class, 'index'])->name('gallery');
 
 Route::get('/administration', function () {
     return view('administration');
@@ -47,7 +48,7 @@ Route::get('/calendar', function () {
     return view('calendar');
 });
 
-// Calendar API Route (added to web.php since you don't have api.php)
+// Calendar API Route
 Route::get('/api/calendar-events', [CalendarController::class, 'index']);
 
 // Auth Protected Routes
@@ -79,7 +80,7 @@ Route::middleware(['auth', 'verified', 'role:trainer|administrator'])->prefix('t
     })->name('dashboard');
 });
 
-// System Admin Routes (Custom admin to avoid conflict with Twill)
+// System Admin Routes
 Route::middleware(['auth', 'verified', 'role:administrator'])->prefix('system')->name('system.')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
@@ -99,7 +100,6 @@ Route::get('/users', function () {
 })->name('users')->middleware(['auth', 'verified', 'role:administrator']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Only allow administrators to access user management
     Route::middleware(['role:administrator'])->group(function () {
         Route::resource('users', \jeremykenedy\LaravelUsers\App\Http\Controllers\UsersManagementController::class);
     });

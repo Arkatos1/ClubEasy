@@ -155,8 +155,7 @@ return [
     |
     */
     'upload' => [
-
-        // Disk in `config/filesystem.php`.
+        // Use 'public' disk to match Canvas.
         'disk' => 'public',
 
         // Image and file upload path under the disk above.
@@ -409,6 +408,8 @@ return [
     |
     */
     'extensions' => [
-
+        'media-manager' => [
+            'disk' => 'public'
+        ],
     ],
 ];
