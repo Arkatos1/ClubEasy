@@ -28,7 +28,7 @@ class MembershipController extends Controller
             $user->update(['payment_reference' => $paymentReference]);
         }
 
-        $amount = '500.00'; // Fixed amount to 500.00
+        $amount = '500.00';
 
         // Get from .env
         $iban = env('CZECH_IBAN', 'CZ5855000000001265098001');
@@ -68,49 +68,34 @@ class MembershipController extends Controller
     }
 
     /**
-     * Generate Czech QR Platba format - CORRECTED IMPLEMENTATION
-     * Official spec: https://qr-platba.cz/pro-vyvojare/
+     * Generate Czech QR Platba format
      */
     private function generateQRPlatbaData(string $amount, string $currency = 'CZK', string $reference = '', string $message = '', string $beneficiary = ''): string
     {
         $components = [];
         $components[] = "SPD";
         $components[] = "1.0";
-
-        // Account - MUST be IBAN format for Czech banks
-        // Using test IBAN from official specification: CZ5855000000001265098001
         $components[] = "ACC:CZ5855000000001265098001";
-
-        // Amount - format correctly with 2 decimal places
         $components[] = "AM:" . number_format(floatval($amount), 2, '.', '');
-
-        // Currency
         $components[] = "CC:" . $currency;
 
-        // Use X-VS for Czech variable symbol (instead of RF)
         if (!empty($reference)) {
-            // Ensure reference is max 10 digits for Czech banks
             $reference = substr(preg_replace('/[^0-9]/', '', $reference), 0, 10);
             if (!empty($reference)) {
                 $components[] = "X-VS:" . $reference;
             }
         }
 
-        // Beneficiary name (optional but recommended)
         if (!empty($beneficiary)) {
-            // Remove special characters and limit length
             $beneficiary = preg_replace('/[^*A-Z0-9 \-\/]/', '', strtoupper($beneficiary));
             $components[] = "RN:" . substr($beneficiary, 0, 35);
         }
 
-        // Message (optional)
         if (!empty($message)) {
-            // Remove special characters and limit length
             $message = preg_replace('/[^*A-Z0-9 \-\/]/', '', strtoupper($message));
             $components[] = "MSG:" . substr($message, 0, 60);
         }
 
-        // Generate CRC32 checksum - CORRECTED: calculate without final asterisk
         $dataString = implode('*', $components);
         $crc = $this->calculateCRC32($dataString);
         $components[] = "CRC32:" . $crc;
@@ -119,13 +104,12 @@ class MembershipController extends Controller
     }
 
     /**
-     * Calculate CRC32 checksum according to QR Platba specification
+     * Calculate CRC32 checksum
      */
     private function calculateCRC32(string $data): string
     {
         $crc = crc32($data);
 
-        // Handle negative CRC values on 32-bit systems
         if ($crc & 0x80000000) {
             $crc ^= 0xffffffff;
             $crc += 1;
@@ -135,35 +119,31 @@ class MembershipController extends Controller
     }
 
     /**
-     * Validate QR Platba format (basic validation)
+     * Validate QR Platba format
      */
     private function validateQRPlatbaFormat(string $qrData): bool
     {
-        // Basic validation checks
         $checks = [
             str_starts_with($qrData, 'SPD*1.0*'),
             str_contains($qrData, 'ACC:'),
             str_contains($qrData, 'AM:'),
             str_contains($qrData, 'CC:CZK'),
             str_contains($qrData, 'CRC32:'),
-            strlen($qrData) <= 512 // Reasonable length limit
+            strlen($qrData) <= 512
         ];
 
         return !in_array(false, $checks);
     }
 
     /**
-     * Generate proper Czech payment reference (max 10 digits)
+     * Generate Czech payment reference
      */
     private function generateCzechReference(int $userId): string
     {
-        // Format: user ID + random digits (max 10 digits total)
         $base = str_pad($userId, 6, '0', STR_PAD_LEFT);
         $random = mt_rand(1000, 9999);
-
         $reference = $base . $random;
 
-        // Ensure max 10 digits
         if (strlen($reference) > 10) {
             $reference = substr($reference, 0, 10);
         }
@@ -178,7 +158,6 @@ class MembershipController extends Controller
     {
         $user = Auth::user();
 
-        // Generate payment reference if missing
         if (!$user->payment_reference) {
             $paymentReference = $this->generateCzechReference($user->id);
             $user->update(['payment_reference' => $paymentReference]);
@@ -194,95 +173,51 @@ class MembershipController extends Controller
     }
 
     /**
-     * Process payment confirmation - NEW VERSION
+     * Process payment confirmation
      */
-/**
- * Process payment confirmation - DEBUG VERSION
- */
-public function processConfirmation(Request $request): RedirectResponse
-{
-    \Log::info("=== PROCESS CONFIRMATION STARTED ===");
-    $user = Auth::user();
-    \Log::info("User ID: " . $user->id . ", Email: " . $user->email);
+    public function processConfirmation(Request $request): RedirectResponse
+    {
+        $user = Auth::user();
 
-    // Check if already a member
-    if ($user->hasRole('member')) {
-        \Log::info("User already member - aborting");
-        return redirect()->route('membership.index')
-            ->with('error', 'Již jste členem klubu!');
-    }
-
-    // Check if payment already pending
-    if ($user->payment_status === 'pending') {
-        \Log::info("Payment already pending - aborting");
-        return redirect()->route('membership.index')
-            ->with('info', 'Vaše platba již čeká na schválení.');
-    }
-
-    \Log::info("Current payment_status: " . ($user->payment_status ?? 'NULL'));
-    \Log::info("Current payment_reference: " . ($user->payment_reference ?? 'NULL'));
-
-    // Generate payment reference if missing
-    if (!$user->payment_reference) {
-        $paymentReference = $this->generateCzechReference($user->id);
-        \Log::info("Generated new reference: " . $paymentReference);
-
-        // Update user with reference FIRST
-        $updateResult = $user->update([
-            'payment_reference' => $paymentReference
-        ]);
-        \Log::info("Reference update result: " . ($updateResult ? 'SUCCESS' : 'FAILED'));
-
-        // Refresh user object to get the new reference
-        $user->refresh();
-        \Log::info("After refresh - payment_reference: " . ($user->payment_reference ?? 'NULL'));
-    }
-
-    // Set payment as pending
-    \Log::info("Setting payment as pending...");
-    $updateResult = $user->update([
-        'payment_status' => 'pending',
-        'payment_submitted_at' => now(),
-        'payment_verified_at' => null
-    ]);
-
-    \Log::info("Pending status update result: " . ($updateResult ? 'SUCCESS' : 'FAILED'));
-
-    // Refresh again to confirm changes
-    $user->refresh();
-    \Log::info("Final status - payment_status: " . ($user->payment_status ?? 'NULL'));
-    \Log::info("Final reference - payment_reference: " . ($user->payment_reference ?? 'NULL'));
-
-    // Get all admin users
-    $admins = User::whereHas('roles', function($query) {
-        $query->where('slug', 'administrator');
-    })->get();
-
-    \Log::info("Found " . $admins->count() . " admins to notify");
-
-    // Send notification to all admins
-    foreach ($admins as $admin) {
-        try {
-            $admin->notify(new PaymentReceivedNotification($user, '500.00'));
-            \Log::info("Notification sent to admin: " . $admin->email);
-        } catch (\Exception $e) {
-            \Log::error("Failed to send notification to " . $admin->email . ": " . $e->getMessage());
+        if ($user->hasRole('member')) {
+            return redirect()->route('membership.index')
+                ->with('error', 'Již jste členem klubu!');
         }
-    }
 
-    // Send confirmation to the user
-    try {
+        if ($user->payment_status === 'pending') {
+            return redirect()->route('membership.index')
+                ->with('info', 'Vaše platba již čeká na schválení.');
+        }
+
+        if (!$user->payment_reference) {
+            $paymentReference = $this->generateCzechReference($user->id);
+            $user->update(['payment_reference' => $paymentReference]);
+        }
+
+        $user->update([
+            'payment_status' => 'pending',
+            'payment_submitted_at' => now(),
+            'payment_verified_at' => null
+        ]);
+
+        $admins = User::whereHas('roles', function($query) {
+            $query->where('slug', 'administrator');
+        })->get();
+
+        foreach ($admins as $admin) {
+            $admin->notify(new PaymentReceivedNotification($user, '500.00'));
+        }
+
         $user->notify(new PaymentConfirmationPendingNotification());
-        \Log::info("Confirmation sent to user: " . $user->email);
-    } catch (\Exception $e) {
-        \Log::error("Failed to send user confirmation: " . $e->getMessage());
+
+        Log::info("Payment confirmation submitted", [
+            'user_id' => $user->id,
+            'reference' => $user->payment_reference
+        ]);
+
+        return redirect()->route('membership.index')
+            ->with('success', 'Děkujeme! Vaše platba byla nahlášena a čeká na schválení. O aktivaci členství vás budeme informovat.');
     }
-
-    \Log::info("=== PROCESS CONFIRMATION COMPLETED ===");
-
-    return redirect()->route('membership.index')
-        ->with('success', 'Děkujeme! Vaše platba byla nahlášena a čeká na schválení. O aktivaci členství vás budeme informovat.');
-}
 
     /**
      * Cancel pending payment
@@ -311,11 +246,10 @@ public function processConfirmation(Request $request): RedirectResponse
     }
 
     /**
-     * ADMIN: Check for missing payments (manual process)
+     * ADMIN: Check for missing payments
      */
     public function adminPaymentCheck(): View
     {
-        // This would be protected by admin middleware in real app
         $confirmedUsers = \App\Models\User::whereNotNull('payment_verified_at')
             ->where('payment_status', 'verified')
             ->with('roles')
