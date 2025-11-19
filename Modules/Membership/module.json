@@ -1,14 +1,12 @@
 {
     "name": "Membership",
     "alias": "membership",
-    "description": "Membership management using JobMetric package",
+    "description": "Custom membership management system",
     "keywords": [],
     "priority": 0,
     "providers": [
-        "JobMetric\\Membership\\MembershipServiceProvider"
+        "Modules\\Membership\\Providers\\MembershipServiceProvider"
     ],
-    "aliases": {
-        "Membership": "JobMetric\\Membership\\Facades\\Membership"
-    },
+    "aliases": {},
     "files": []
 }
