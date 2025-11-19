@@ -16,16 +16,16 @@
 @endsection
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid">
         @if(config('laravelusers.enablePackageBootstapAlerts'))
             <div class="row">
-                <div class="col-lg-10 offset-lg-1">
+                <div class="col-lg-12">
                     @include('laravelusers::partials.form-status')
                 </div>
             </div>
         @endif
         <div class="row">
-            <div class="col-lg-10 offset-lg-1">
+            <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -106,6 +106,48 @@
                                     </div>
                                 </li>
                             @endif
+
+                            <!-- Membership Information -->
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-4 col-sm-3">
+                                        <strong>
+                                            Stav členství
+                                        </strong>
+                                    </div>
+                                    <div class="col-8 col-sm-9">
+                                        @if($user->hasActiveMembership())
+                                            <span class="text-success">
+                                                <i class="fas fa-check-circle fa-lg"></i>
+                                                Aktivní člen
+                                            </span>
+                                        @elseif($user->hasPendingMembership())
+                                            <span class="text-warning">
+                                                <i class="fas fa-clock fa-lg"></i>
+                                                Čeká na schválení
+                                            </span>
+                                        @else
+                                            <span class="text-danger">
+                                                <i class="fas fa-times-circle fa-lg"></i>
+                                                Neaktivní
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="row">
+                                    <div class="col-4 col-sm-3">
+                                        <strong>
+                                            Platné do
+                                        </strong>
+                                    </div>
+                                    <div class="col-8 col-sm-9">
+                                        {{ $user->membership_expiry }}
+                                    </div>
+                                </div>
+                            </li>
+
                             @if(config('laravelusers.rolesEnabled'))
                                 <li class="list-group-item">
                                     <div class="row">
@@ -186,6 +228,44 @@
                                 </li>
                             @endif
                         </ul>
+
+                        <!-- Detailed Membership Information -->
+                        @if($user->hasActiveMembership())
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title">Informace o členství</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>Stav členství:</strong><br>
+                                        <span class="text-success">
+                                            <i class="fas fa-check-circle fa-lg"></i>
+                                            Aktivní člen
+                                        </span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Platné do:</strong><br>
+                                        {{ $user->membership_expiry }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Členské ID:</strong><br>
+                                        {{ $user->activeMembership()->id }}
+                                    </div>
+                                </div>
+
+                                @if($user->hasActiveMembership())
+                                <div class="mt-3">
+                                    @php $membership = $user->activeMembership(); @endphp
+                                    <small class="text-muted">
+                                        Variabilní symbol: {{ $membership->payment_reference }} |
+                                        Aktivováno: {{ $membership->payment_verified_at->format('d.m.Y H:i') }}
+                                    </small>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

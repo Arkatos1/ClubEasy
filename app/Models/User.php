@@ -169,4 +169,44 @@ class User extends Authenticatable
     {
         return !is_null($this->pendingMembership());
     }
+
+    /**
+     * Get membership status text attribute
+     */
+    public function getMembershipStatusTextAttribute()
+    {
+        if ($this->hasActiveMembership()) {
+            return 'Aktivní člen';
+        } elseif ($this->hasPendingMembership()) {
+            return 'Čeká na schválení';
+        } else {
+            return 'Neaktivní';
+        }
+    }
+
+    /**
+     * Get membership expiry date attribute
+     */
+    public function getMembershipExpiryAttribute()
+    {
+        $membership = $this->activeMembership();
+        return $membership ? $membership->expires_at->format('d.m.Y') : '—';
+    }
+
+    /**
+     * Get membership type attribute
+     */
+    public function getMembershipTypeAttribute()
+    {
+        $membership = $this->activeMembership();
+        if (!$membership) return '—';
+
+        return match($membership->type) {
+            'premium' => 'Prémiové',
+            'family' => 'Rodinné',
+            'basic' => 'Základní',
+            default => $membership->type
+        };
+    }
+
 }

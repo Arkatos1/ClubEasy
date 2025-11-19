@@ -14,6 +14,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
 
     @yield('template_linked_css')
+
+    <style>
+        /* Reasonable max-width for better layout */
+        .max-w-custom {
+            max-width: 70% !important;
+        }
+        .container-fluid {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        /* Ensure card header buttons are properly aligned */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header .btn-group {
+            margin-left: auto;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Banner -->
@@ -24,8 +44,8 @@
     <!-- Unified navigation -->
     @include('layouts.navigation')
 
-    <!-- Main Content Area with Bootstrap -->
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Main Content Area with Bootstrap - REASONABLE WIDTH -->
+    <main class="max-w-custom mx-auto py-6 sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 bg-white border-b border-gray-200">
                 {{-- Bootstrap Content Here --}}

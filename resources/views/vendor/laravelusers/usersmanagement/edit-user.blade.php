@@ -201,6 +201,134 @@
                                 </div>
                             </div>
                         </form>
+
+                        <!-- Membership Management Section -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title">Správa členství</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Current Membership Status -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Aktuální stav:</strong></label>
+                                    <div>
+                                        @if($user->hasActiveMembership())
+                                            <span class="text-success">
+                                                <i class="fas fa-check-circle fa-lg"></i>
+                                                Aktivní člen
+                                            </span>
+                                        @elseif($user->hasPendingMembership())
+                                            <span class="text-warning">
+                                                <i class="fas fa-clock fa-lg"></i>
+                                                Čeká na schválení
+                                            </span>
+                                        @else
+                                            <span class="text-danger">
+                                                <i class="fas fa-times-circle fa-lg"></i>
+                                                Neaktivní
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Manual Membership Actions -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Akce členství:</strong></label>
+                                    <div>
+                                        @if($user->hasActiveMembership())
+                                            <form action="{{ route('administration.payments.reject', $user->activeMembership()) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-warning btn-sm"
+                                                        onclick="return confirm('Opravdu chcete zrušit členství uživatele {{ $user->name }}?')">
+                                                    Zrušit členství
+                                                </button>
+                                            </form>
+                                        @elseif($user->hasPendingMembership())
+                                            <form action="{{ route('administration.payments.verify', $user->pendingMembership()) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    Schválit členství
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('administration.payments.reject', $user->pendingMembership()) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    Zamítnout členství
+                                                </button>
+                                            </form>
+                                        @else
+                                            <button type="button" class="btn btn-info btn-sm" disabled>
+                                                Žádné členství ke správě
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Membership History -->
+                                <div class="mt-3">
+                                    <label class="form-label"><strong>Historie členství:</strong></label>
+                                    @if($user->memberships->count() > 0)
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Typ</th>
+                                                        <th>Stav</th>
+                                                        <th>Platné do</th>
+                                                        <th>Datum schválení</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($user->memberships as $membership)
+                                                    <tr>
+                                                        <td>{{ $membership->id }}</td>
+                                                        <td>
+                                                            @if($membership->type === 'premium') Prémiové
+                                                            @elseif($membership->type === 'family') Rodinné
+                                                            @elseif($membership->type === 'basic') Základní
+                                                            @else {{ $membership->type }} @endif
+                                                        </td>
+                                                        <td>
+                                                            @if($membership->status === 'active')
+                                                                <span class="text-success">
+                                                                    <i class="fas fa-check-circle"></i>
+                                                                    Aktivní
+                                                                </span>
+                                                            @elseif($membership->status === 'pending')
+                                                                <span class="text-warning">
+                                                                    <i class="fas fa-clock"></i>
+                                                                    Čekající
+                                                                </span>
+                                                            @elseif($membership->status === 'expired')
+                                                                <span class="text-secondary">
+                                                                    <i class="fas fa-calendar-times"></i>
+                                                                    Expirované
+                                                                </span>
+                                                            @elseif($membership->status === 'cancelled')
+                                                                <span class="text-danger">
+                                                                    <i class="fas fa-times-circle"></i>
+                                                                    Zrušené
+                                                                </span>
+                                                            @else
+                                                                <span class="text-dark">
+                                                                    {{ $membership->status }}
+                                                                </span>
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $membership->expires_at ? $membership->expires_at->format('d.m.Y') : '—' }}</td>
+                                                        <td>{{ $membership->payment_verified_at ? $membership->payment_verified_at->format('d.m.Y H:i') : '—' }}</td>
+                                                    </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @else
+                                        <p class="text-muted">Žádná historie členství.</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

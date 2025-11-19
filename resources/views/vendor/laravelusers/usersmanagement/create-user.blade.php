@@ -171,6 +171,11 @@
                                     @endif
                                 </div>
                             </div>
+
+                            <div class="alert alert-info mt-3">
+                                <strong>Poznámka:</strong> Členství lze přiřadit po vytvoření uživatele v editaci.
+                            </div>
+
                             <button type="submit" class="btn btn-success margin-bottom-1 mb-1 float-right">
                                 @if(config('laravelusers.fontAwesomeEnabled'))
                                     <i class="fa fa-user-plus" aria-hidden="true"></i>

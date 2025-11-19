@@ -13,28 +13,45 @@
     @endif
     @include('laravelusers::partials.styles')
     @include('laravelusers::partials.bs-visibility-css')
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .users-table {
+            min-width: 900px;
+        }
+        /* Ensure proper card header layout */
+        .card-header > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .card-header .btn-group {
+            margin-left: auto;
+        }
+    </style>
 @endsection
 
 @section('content')
     <div class="container">
         @if(config('laravelusers.enablePackageBootstapAlerts'))
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-12">
                     @include('laravelusers::partials.form-status')
                 </div>
             </div>
         @endif
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-
+                        <div class="d-flex justify-content-between align-items-center w-100">
                             <span id="card_title">
                                 {!! trans('laravelusers::laravelusers.showing-all-users') !!}
                             </span>
 
-                            <div class="btn-group pull-right btn-group-xs">
+                            <div class="btn-group">
                                 @if(config('laravelusers.softDeletedEnabled'))
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="fa fa-ellipsis-v fa-fw" aria-hidden="true"></i>
@@ -61,7 +78,7 @@
                                         </li>
                                     </ul>
                                 @else
-                                    <a href="{{ route('users.create') }}" class="btn btn-default btn-sm pull-right" data-toggle="tooltip" data-placement="left" title="{!! trans('laravelusers::laravelusers.tooltips.create-new') !!}">
+                                    <a href="{{ route('users.create') }}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="left" title="{!! trans('laravelusers::laravelusers.tooltips.create-new') !!}">
                                         @if(config('laravelusers.fontAwesomeEnabled'))
                                             <i class="fa fa-fw fa-user-plus" aria-hidden="true"></i>
                                         @endif
@@ -87,11 +104,11 @@
                                         <th>{!! trans('laravelusers::laravelusers.users-table.id') !!}</th>
                                         <th>{!! trans('laravelusers::laravelusers.users-table.name') !!}</th>
                                         <th class="hidden-xs">{!! trans('laravelusers::laravelusers.users-table.email') !!}</th>
+                                        <th>Stav členství</th>
+                                        <th>Platné do</th>
                                         @if(config('laravelusers.rolesEnabled'))
                                             <th class="hidden-sm hidden-xs">{!! trans('laravelusers::laravelusers.users-table.role') !!}</th>
                                         @endif
-                                        <th class="hidden-sm hidden-xs hidden-md">{!! trans('laravelusers::laravelusers.users-table.created') !!}</th>
-                                        <th class="hidden-sm hidden-xs hidden-md">{!! trans('laravelusers::laravelusers.users-table.updated') !!}</th>
                                         <th class="no-search no-sort">{!! trans('laravelusers::laravelusers.users-table.actions') !!}</th>
                                         <th class="no-search no-sort"></th>
                                         <th class="no-search no-sort"></th>
@@ -103,6 +120,25 @@
                                             <td>{{$user->id}}</td>
                                             <td>{{$user->name}}</td>
                                             <td class="hidden-xs">{{$user->email}}</td>
+                                            <td>
+                                                @if($user->hasActiveMembership())
+                                                    <span class="text-success" title="Aktivní člen">
+                                                        <i class="fas fa-check-circle fa-lg"></i>
+                                                        Aktivní
+                                                    </span>
+                                                @elseif($user->hasPendingMembership())
+                                                    <span class="text-warning" title="Čeká na schválení">
+                                                        <i class="fas fa-clock fa-lg"></i>
+                                                        Čekající
+                                                    </span>
+                                                @else
+                                                    <span class="text-danger" title="Neaktivní">
+                                                        <i class="fas fa-times-circle fa-lg"></i>
+                                                        Neaktivní
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $user->membership_expiry }}</td>
                                             @if(config('laravelusers.rolesEnabled'))
                                                 <td class="hidden-sm hidden-xs">
                                                     @foreach ($user->roles as $user_role)
@@ -119,8 +155,6 @@
                                                     @endforeach
                                                 </td>
                                             @endif
-                                            <td class="hidden-sm hidden-xs hidden-md">{{$user->created_at}}</td>
-                                            <td class="hidden-sm hidden-xs hidden-md">{{$user->updated_at}}</td>
                                             <td>
                                                 <form method="POST" action="{{ url('users/' . $user->id) }}" class="" data-toggle="tooltip" title="{{ trans('laravelusers::laravelusers.tooltips.delete') }}">
                                                     @csrf
@@ -176,5 +210,4 @@
     @if(config('laravelusers.enableSearchUsers'))
         @include('laravelusers::scripts.search-users')
     @endif
-
 @endsection
