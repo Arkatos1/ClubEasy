@@ -15,7 +15,7 @@ return [
     'authEnabled'                   => true,
 
     // Enable Optional Roles Middleware on the users assignments
-    'rolesEnabled'                  => false,
+    'rolesEnabled'                  => true,
 
     /*
      | Enable Roles Middlware on the usability of this package.
@@ -24,7 +24,7 @@ return [
      | 'role' => \jeremykenedy\LaravelRoles\Middleware\VerifyRole::class,
      */
 
-    'rolesMiddlwareEnabled'         => true,
+    'rolesMiddlwareEnabled'         => false,
 
     // Optional Roles Middleware
     'rolesMiddlware'                => 'role:admin',

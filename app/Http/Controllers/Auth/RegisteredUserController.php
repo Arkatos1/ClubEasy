@@ -10,8 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\Routing\Redirector; // Add this import
-use jeremykenedy\LaravelRoles\Models\Role; // Add this import
+use Illuminate\Routing\Redirector;
+use jeremykenedy\LaravelRoles\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -50,8 +50,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Assign default 'user' role
-        $userRole = Role::where('slug', 'user')->first();
+        $userRole = Role::where('slug', 'registered')->first();
         if ($userRole) {
             $user->attachRole($userRole);
         }
@@ -60,7 +59,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect('/dashboard'); // Use direct path instead of RouteServiceProvider
+        return redirect('/');
     }
 
     protected function generateUniqueUsername($baseUsername)

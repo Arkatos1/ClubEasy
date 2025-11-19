@@ -99,7 +99,6 @@
                                     <div class="col-md-9">
                                     <div class="input-group">
                                         <select class="custom-select form-control" name="role" id="role">
-                                            <option value="">{{ trans('laravelusers::forms.create_user_ph_role') }}</option>
                                             @if ($roles)
                                                 @foreach($roles as $role)
                                                     <option value="{{ $role->id }}" {{ old('role') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>

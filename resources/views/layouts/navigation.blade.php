@@ -11,8 +11,10 @@
                 <a href="{{ url('/about') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('about') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('About Us') }}</a>
 
                 @auth
-                    <!-- Membership Tab for all authenticated users -->
-                    <a href="{{ route('membership.index') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('membership*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Membership') }}</a>
+                    {{-- Membership Tab for users and above --}}
+                    @if(auth()->user()->hasRole('registered') || auth()->user()->hasRole('member') || auth()->user()->hasRole('trainer') || auth()->user()->hasRole('administrator'))
+                        <a href="{{ route('membership.index') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('membership*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Membership') }}</a>
+                    @endif
 
                     <!-- Trainer-specific tabs -->
                     @if(auth()->user()->hasRole('trainer') || auth()->user()->hasRole('administrator'))

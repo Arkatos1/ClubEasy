@@ -48,19 +48,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(Competitor::class, 'user_id');
     }
-
-    public function hasMembership()
-    {
-        return $this->hasRole('member');
-    }
-
-        /**
-         * Check if user is administrator for Open Admin
-         */
-        public function isAdministrator()
-        {
-            return $this->hasRole('administrator');
-        }
     /**
      * Open Admin required methods - proper implementation
      */
@@ -125,4 +112,19 @@ class User extends Authenticatable
     {
         return 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?d=identicon';
     }
+    public function hasMembership()
+    {
+        return $this->hasRole('member') || $this->hasRole('trainer') || $this->hasRole('administrator');
+    }
+
+    public function isAdministrator()
+    {
+        return $this->hasRole('administrator');
+    }
+
+    public function isTrainer()
+    {
+        return $this->hasRole('trainer') || $this->hasRole('administrator');
+    }
+
 }

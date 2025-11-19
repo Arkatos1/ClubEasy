@@ -11,34 +11,22 @@ class RolesTableSeeder extends Seeder
     {
         $roles = [
             [
-                'name' => 'Visitor',
-                'slug' => 'visitor',
-                'description' => 'Unauthenticated visitor',
-                'level' => 0,
-            ],
-            [
                 'name' => 'User',
-                'slug' => 'user',
-                'description' => 'Registered club member',
+                'slug' => 'registered',
+                'description' => 'Basic registered user without membership',
                 'level' => 1,
             ],
             [
-                'name' => 'Player',
-                'slug' => 'player',
-                'description' => 'Sports player',
-                'level' => 2,
-            ],
-            [
-                'name' => 'Parent',
-                'slug' => 'parent',
-                'description' => 'Player parent/guardian',
+                'name' => 'Member',
+                'slug' => 'member',
+                'description' => 'Paid club member with full access',
                 'level' => 2,
             ],
             [
                 'name' => 'Trainer',
                 'slug' => 'trainer',
                 'description' => 'Club trainer/coach',
-                'level' => 3,
+                'level' => 5,
             ],
             [
                 'name' => 'Administrator',
@@ -50,6 +38,12 @@ class RolesTableSeeder extends Seeder
 
         foreach ($roles as $role) {
             Role::firstOrCreate(['slug' => $role['slug']], $role);
+        }
+
+        // Delete old roles that are no longer needed
+        $oldRoles = ['visitor', 'user', 'player', 'parent'];
+        foreach ($oldRoles as $oldRole) {
+            Role::where('slug', $oldRole)->delete();
         }
     }
 }
