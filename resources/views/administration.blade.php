@@ -14,8 +14,8 @@
                 </p>
             </div>
 
-            <!-- Admin Cards Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <!-- Admin Cards Grid - 2 per row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <!-- Blog Management Card -->
                 <a href="{{ url('/canvas') }}" class="block group">
                     <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-8 text-white hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between min-h-[280px]">
@@ -37,11 +37,11 @@
 
                 <!-- App Management Card -->
                 <a href="/admin" class="block group">
-                    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between min-h-[280px]">
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-8 text-white hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between min-h-[280px]">
                         <div class="flex-1">
                             <div class="text-5xl mb-6 text-center">⚙️</div>
                             <h3 class="text-2xl font-bold mb-4 text-center">Správa aplikace</h3>
-                            <p class="text-center leading-relaxed">
+                            <p class="text-green-100 text-center leading-relaxed">
                                 Správa aplikace, databáze a systémových nastavení
                             </p>
                         </div>
@@ -53,10 +53,13 @@
                         </div>
                     </div>
                 </a>
+            </div>
 
+            <!-- Second Row - 2 per row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
                 <!-- User Management Card -->
                 <a href="{{ route('users.index') }}" class="block group">
-                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between min-h-[280px]">
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-8 text-white hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between min-h-[280px]">
                         <div class="flex-1">
                             <div class="text-5xl mb-6 text-center">👥</div>
                             <h3 class="text-2xl font-bold mb-4 text-center">Správa uživatelů</h3>
@@ -64,8 +67,27 @@
                                 Správa uživatelů, rolí a oprávnění v celém systému
                             </p>
                         </div>
-                        <div class="mt-6 flex items-center justify-center group-hover:text-white transition-colors">
+                        <div class="mt-6 flex items-center justify-center text-purple-200 group-hover:text-white transition-colors">
                             <span class="font-semibold text-lg">Přejít do správy uživatelů</span>
+                            <svg class="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Payment Management Card -->
+                <a href="{{ route('administration.payments') }}" class="block group">
+                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-8 text-white hover:shadow-xl transition-all duration-300 h-full flex flex-col justify-between min-h-[280px]">
+                        <div class="flex-1">
+                            <div class="text-5xl mb-6 text-center">💰</div>
+                            <h3 class="text-2xl font-bold mb-4 text-center">Správa plateb</h3>
+                            <p class="text-orange-100 text-center leading-relaxed">
+                                Schvalování plateb za členství a správa finančních transakcí
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-center text-orange-200 group-hover:text-white transition-colors">
+                            <span class="font-semibold text-lg">Přejít do správy plateb</span>
                             <svg class="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>

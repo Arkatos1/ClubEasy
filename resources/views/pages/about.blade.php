@@ -1,13 +1,13 @@
 @extends('layouts.master')
 
-@section('title', 'O naším klubu')
+@section('title', 'O našem klubu')
 
 @section('content')
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 bg-white border-b border-gray-200">
-                <h1 class="text-3xl font-bold text-gray-900 mb-6">O naším klubu</h1>
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">O našem klubu</h1>
 
                 <div class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-800 mb-6">Naše historie</h2>
@@ -20,7 +20,7 @@
                                 <h3 class="font-semibold text-lg text-gray-800 mb-2">Založení klubu</h3>
                                 <p class="text-gray-600">
                                     Sportovní klub byl založen skupinou nadšenců s vizí vytvořit komunitní sportovní centrum
-                                    pro všechny generace. Začali jsme s jedním fotbalovým týmem a tenisovým kurtem.
+                                    pro všechny generace. Začali jsme s jedním fotbalovým týmem a tenisovým oddílem.
                                 </p>
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                                 <h3 class="font-semibold text-lg text-gray-800 mb-2">Modernizace areálu</h3>
                                 <p class="text-gray-600">
                                     Kompletní rekonstrukce sportovního areálu s novými šatnami,
-                                    klubovnou a zázemím pro sportovce. Přibyly dva nové tenisové kurty.
+                                    klubovnou a zázemím pro sportovce.
                                 </p>
                             </div>
                         </div>

@@ -208,7 +208,7 @@ class MembershipController extends Controller
             $admin->notify(new PaymentReceivedNotification($user, '500.00'));
         }
 
-        $user->notify(new PaymentConfirmationPendingNotification());
+        $user->notify(new PaymentConfirmationPendingNotification($user));
 
         Log::info("Payment confirmation submitted", [
             'user_id' => $user->id,

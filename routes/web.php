@@ -9,6 +9,16 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CalendarController;
 use Modules\Membership\Http\Controllers\MembershipController;
 
+Route::middleware(['auth', 'verified', 'role:administrator'])->prefix('administration')->name('administration.')->group(function () {
+    // Existing routes...
+
+    // New Payment Management Routes
+    Route::get('/payments', [\App\Http\Controllers\PaymentAdminController::class, 'index'])->name('payments');
+    Route::get('/payments/pending', [\App\Http\Controllers\PaymentAdminController::class, 'pending'])->name('payments.pending');
+    Route::post('/payments/{user}/verify', [\App\Http\Controllers\PaymentAdminController::class, 'verifyPayment'])->name('payments.verify');
+    Route::post('/payments/{user}/reject', [\App\Http\Controllers\PaymentAdminController::class, 'rejectPayment'])->name('payments.reject');
+});
+
 // Public Routes - Home page
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
