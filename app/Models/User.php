@@ -24,6 +24,14 @@ class User extends Authenticatable
         'username',
         'password',
         'avatar',
+        'summary',
+        'dark_mode',
+        'digest',
+        'locale',
+        'payment_reference',
+        'payment_status',
+        'payment_submitted_at',
+        'payment_verified_at',
     ];
 
     public function getNameAttribute()

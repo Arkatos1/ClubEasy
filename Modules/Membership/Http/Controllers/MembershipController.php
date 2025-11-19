@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use jeremykenedy\LaravelRoles\Models\Role;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Notifications\PaymentReceivedNotification;
+use App\Notifications\PaymentConfirmationPendingNotification;
+use App\Models\User;
 
 class MembershipController extends Controller
 {
@@ -25,7 +28,7 @@ class MembershipController extends Controller
             $user->update(['payment_reference' => $paymentReference]);
         }
 
-        $amount = '1.00'; // Real membership fee
+        $amount = '500.00'; // Fixed amount to 500.00
 
         // Get from .env
         $iban = env('CZECH_IBAN', 'CZ5855000000001265098001');
@@ -191,40 +194,120 @@ class MembershipController extends Controller
     }
 
     /**
-     * Process payment confirmation
+     * Process payment confirmation - NEW VERSION
      */
-    public function processConfirmation(Request $request): RedirectResponse
+/**
+ * Process payment confirmation - DEBUG VERSION
+ */
+public function processConfirmation(Request $request): RedirectResponse
+{
+    \Log::info("=== PROCESS CONFIRMATION STARTED ===");
+    $user = Auth::user();
+    \Log::info("User ID: " . $user->id . ", Email: " . $user->email);
+
+    // Check if already a member
+    if ($user->hasRole('member')) {
+        \Log::info("User already member - aborting");
+        return redirect()->route('membership.index')
+            ->with('error', 'Již jste členem klubu!');
+    }
+
+    // Check if payment already pending
+    if ($user->payment_status === 'pending') {
+        \Log::info("Payment already pending - aborting");
+        return redirect()->route('membership.index')
+            ->with('info', 'Vaše platba již čeká na schválení.');
+    }
+
+    \Log::info("Current payment_status: " . ($user->payment_status ?? 'NULL'));
+    \Log::info("Current payment_reference: " . ($user->payment_reference ?? 'NULL'));
+
+    // Generate payment reference if missing
+    if (!$user->payment_reference) {
+        $paymentReference = $this->generateCzechReference($user->id);
+        \Log::info("Generated new reference: " . $paymentReference);
+
+        // Update user with reference FIRST
+        $updateResult = $user->update([
+            'payment_reference' => $paymentReference
+        ]);
+        \Log::info("Reference update result: " . ($updateResult ? 'SUCCESS' : 'FAILED'));
+
+        // Refresh user object to get the new reference
+        $user->refresh();
+        \Log::info("After refresh - payment_reference: " . ($user->payment_reference ?? 'NULL'));
+    }
+
+    // Set payment as pending
+    \Log::info("Setting payment as pending...");
+    $updateResult = $user->update([
+        'payment_status' => 'pending',
+        'payment_submitted_at' => now(),
+        'payment_verified_at' => null
+    ]);
+
+    \Log::info("Pending status update result: " . ($updateResult ? 'SUCCESS' : 'FAILED'));
+
+    // Refresh again to confirm changes
+    $user->refresh();
+    \Log::info("Final status - payment_status: " . ($user->payment_status ?? 'NULL'));
+    \Log::info("Final reference - payment_reference: " . ($user->payment_reference ?? 'NULL'));
+
+    // Get all admin users
+    $admins = User::whereHas('roles', function($query) {
+        $query->where('slug', 'administrator');
+    })->get();
+
+    \Log::info("Found " . $admins->count() . " admins to notify");
+
+    // Send notification to all admins
+    foreach ($admins as $admin) {
+        try {
+            $admin->notify(new PaymentReceivedNotification($user, '500.00'));
+            \Log::info("Notification sent to admin: " . $admin->email);
+        } catch (\Exception $e) {
+            \Log::error("Failed to send notification to " . $admin->email . ": " . $e->getMessage());
+        }
+    }
+
+    // Send confirmation to the user
+    try {
+        $user->notify(new PaymentConfirmationPendingNotification());
+        \Log::info("Confirmation sent to user: " . $user->email);
+    } catch (\Exception $e) {
+        \Log::error("Failed to send user confirmation: " . $e->getMessage());
+    }
+
+    \Log::info("=== PROCESS CONFIRMATION COMPLETED ===");
+
+    return redirect()->route('membership.index')
+        ->with('success', 'Děkujeme! Vaše platba byla nahlášena a čeká na schválení. O aktivaci členství vás budeme informovat.');
+}
+
+    /**
+     * Cancel pending payment
+     */
+    public function cancelPayment(Request $request): RedirectResponse
     {
         $user = Auth::user();
 
-        // Generate payment reference if missing (same as confirmPayment)
-        if (!$user->payment_reference) {
-            $paymentReference = $this->generateCzechReference($user->id);
-            $user->update(['payment_reference' => $paymentReference]);
+        if ($user->payment_status === 'pending') {
+            $user->update([
+                'payment_status' => 'cancelled',
+                'payment_submitted_at' => null
+            ]);
+
+            Log::info("Payment cancelled by user", [
+                'user_id' => $user->id,
+                'reference' => $user->payment_reference
+            ]);
+
+            return redirect()->route('membership.index')
+                ->with('success', 'Platba byla zrušena. Můžete kdykoliv začít znovu.');
         }
-
-        // 🎯 TRUST-BASED SYSTEM: We activate membership immediately
-        $user->update([
-            'payment_verified_at' => now(),
-            'payment_status' => 'verified',
-            'confirmation_submitted_at' => now()
-        ]);
-
-        // Assign member role
-        $memberRole = Role::where('name', 'member')->first();
-        if ($memberRole && !$user->hasRole('member')) {
-            $user->attachRole($memberRole->id);
-        }
-
-        // Log the confirmation (for your manual checking)
-        Log::info("Payment confirmation submitted", [
-            'user_id' => $user->id,
-            'reference' => $user->payment_reference,
-            'ip' => $request->ip()
-        ]);
 
         return redirect()->route('membership.index')
-            ->with('success', 'Payment confirmed! Welcome to the club! Your membership is now active.');
+            ->with('error', 'Nemáte žádnou platbu čekající na schválení.');
     }
 
     /**
