@@ -38,7 +38,7 @@
 
             <!-- Pending Payments List -->
             <div class="bg-white rounded-lg shadow overflow-hidden">
-                @if($pendingUsers->count() > 0)
+                @if($pendingMemberships->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -48,6 +48,9 @@
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Email
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Typ členství
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Variabilní symbol
@@ -64,7 +67,8 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($pendingUsers as $user)
+                                @foreach($pendingMemberships as $membership)
+                                @php $user = $membership->user; @endphp
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
@@ -85,12 +89,28 @@
                                         <div class="text-sm text-gray-900">{{ $user->email }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($membership->type === 'premium')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                Premium
+                                            </span>
+                                        @elseif($membership->type === 'family')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Family
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                Basic
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-mono text-gray-900 bg-yellow-50 px-2 py-1 rounded border">
-                                            {{ $user->payment_reference }}
+                                            {{ $membership->payment_reference }}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $user->payment_submitted_at ? \Carbon\Carbon::parse($user->payment_submitted_at)->format('d.m.Y H:i') : 'N/A' }}                                    </td>
+                                        {{ $membership->payment_submitted_at ? $membership->payment_submitted_at->format('d.m.Y H:i') : 'N/A' }}
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @foreach($user->roles as $role)
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
@@ -103,7 +123,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex justify-end space-x-2">
-                                            <form action="{{ route('administration.payments.verify', $user) }}" method="POST" class="inline">
+                                            <form action="{{ route('administration.payments.verify', $membership) }}" method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit"
                                                         class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition"
@@ -113,7 +133,7 @@
                                             </form>
 
                                             <button type="button"
-                                                    onclick="openRejectModal({{ $user->id }}, '{{ $user->name }}')"
+                                                    onclick="openRejectModal({{ $membership->id }}, '{{ $user->name }}')"
                                                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
                                                 ❌ Zamítnout
                                             </button>
@@ -173,9 +193,9 @@
 </div>
 
 <script>
-function openRejectModal(userId, userName) {
+function openRejectModal(membershipId, userName) {
     const form = document.getElementById('rejectForm');
-    form.action = "/administration/payments/" + userId + "/reject";
+    form.action = "/administration/payments/" + membershipId + "/reject";
 
     const modal = document.getElementById('rejectModal');
     modal.classList.remove('hidden');

@@ -7,17 +7,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\PaymentAdminController;
+use App\Http\Controllers\GalleryController;
 use Modules\Membership\Http\Controllers\MembershipController;
-
-Route::middleware(['auth', 'verified', 'role:administrator'])->prefix('administration')->name('administration.')->group(function () {
-    // Existing routes...
-
-    // New Payment Management Routes
-    Route::get('/payments', [\App\Http\Controllers\PaymentAdminController::class, 'index'])->name('payments');
-    Route::get('/payments/pending', [\App\Http\Controllers\PaymentAdminController::class, 'pending'])->name('payments.pending');
-    Route::post('/payments/{user}/verify', [\App\Http\Controllers\PaymentAdminController::class, 'verifyPayment'])->name('payments.verify');
-    Route::post('/payments/{user}/reject', [\App\Http\Controllers\PaymentAdminController::class, 'rejectPayment'])->name('payments.reject');
-});
 
 // Public Routes - Home page
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -27,9 +19,9 @@ Route::get('/blog/{slug}', [HomeController::class, 'showPost'])->name('blog.show
 Route::get('/topic/{slug}', [HomeController::class, 'topic'])->name('blog.topic');
 
 // Tournaments routes
-Route::get('/tournaments', [App\Http\Controllers\TreeController::class, 'index'])->name('tournaments.index');
-Route::post('/tournaments', [App\Http\Controllers\TreeController::class, 'store'])->name('tournaments.store');
-Route::put('/tournaments/{championship}', [App\Http\Controllers\TreeController::class, 'update'])->name('tournaments.update');
+Route::get('/tournaments', [TreeController::class, 'index'])->name('tournaments.index');
+Route::post('/tournaments', [TreeController::class, 'store'])->name('tournaments.store');
+Route::put('/tournaments/{championship}', [TreeController::class, 'update'])->name('tournaments.update');
 
 // Resource Routes
 Route::resource('players', PlayerController::class);
@@ -39,7 +31,7 @@ Route::get('/sports', function () {
     return view('pages.sports');
 });
 
-Route::get('/gallery', [App\Http\Controllers\GalleryController::class, 'index'])->name('gallery');
+Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery');
 
 Route::get('/administration', function () {
     return view('administration');
@@ -72,16 +64,24 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Membership Routes
 Route::middleware(['auth', 'verified'])->prefix('membership')->name('membership.')->group(function () {
     Route::get('/', [MembershipController::class, 'index'])->name('index');
-    Route::get('/plans', [MembershipController::class, 'plans'])->name('plans');
-    Route::get('/status', [MembershipController::class, 'status'])->name('status');
     Route::post('/subscribe', [MembershipController::class, 'subscribe'])->name('subscribe');
     Route::post('/join', [MembershipController::class, 'join'])->name('join');
     Route::delete('/leave', [MembershipController::class, 'leave'])->name('leave');
     Route::get('/confirm-payment', [MembershipController::class, 'confirmPayment'])->name('confirm-payment');
     Route::post('/confirm-payment', [MembershipController::class, 'processConfirmation'])->name('process-confirmation');
     Route::post('/cancel-payment', [MembershipController::class, 'cancelPayment'])->name('cancel-payment');
+});
+
+// Administration Routes
+Route::middleware(['auth', 'verified', 'role:administrator'])->prefix('administration')->name('administration.')->group(function () {
+    // Payment Management Routes
+    Route::get('/payments', [PaymentAdminController::class, 'index'])->name('payments');
+    Route::get('/payments/pending', [PaymentAdminController::class, 'pending'])->name('payments.pending');
+    Route::post('/payments/{membership}/verify', [PaymentAdminController::class, 'verifyPayment'])->name('payments.verify');
+    Route::post('/payments/{membership}/reject', [PaymentAdminController::class, 'rejectPayment'])->name('payments.reject');
 });
 
 // Trainer Routes
@@ -106,6 +106,7 @@ Route::middleware(['auth', 'verified', 'role:administrator'])->prefix('system')-
     })->name('roles');
 });
 
+// Laravel Users Management
 Route::get('/users', function () {
     return app()->make(\jeremykenedy\LaravelUsers\App\Http\Controllers\UsersManagementController::class)->index();
 })->name('users')->middleware(['auth', 'verified', 'role:administrator']);
@@ -118,6 +119,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__.'/auth.php';
 
+// Canvas UI Routes
 Route::prefix('canvas-ui')->group(function () {
     Route::prefix('api')->group(function () {
         Route::get('posts', [\App\Http\Controllers\CanvasUiController::class, 'getPosts']);

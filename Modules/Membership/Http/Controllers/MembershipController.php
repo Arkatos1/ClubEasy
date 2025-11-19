@@ -13,6 +13,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Notifications\PaymentReceivedNotification;
 use App\Notifications\PaymentConfirmationPendingNotification;
 use App\Models\User;
+use App\Models\Membership;
 
 class MembershipController extends Controller
 {
@@ -20,13 +21,13 @@ class MembershipController extends Controller
     {
         $user = Auth::user();
 
-        // Generate or reuse payment reference
-        $paymentReference = $user->payment_reference ?? $this->generateCzechReference($user->id);
+        // Get or create payment reference from active/pending membership
+        $activeMembership = $user->activeMembership();
+        $pendingMembership = $user->pendingMembership();
 
-        // Store reference if new
-        if (!$user->payment_reference) {
-            $user->update(['payment_reference' => $paymentReference]);
-        }
+        $paymentReference = $activeMembership?->payment_reference ??
+                           $pendingMembership?->payment_reference ??
+                           $this->generateCzechReference($user->id);
 
         $amount = '500.00';
 
@@ -62,8 +63,8 @@ class MembershipController extends Controller
             'beneficiary' => $beneficiary,
             'qrData' => $qrPlatbaData,
             'isValidFormat' => $isValidFormat,
-            'paymentVerified' => !is_null($user->payment_verified_at),
-            'paymentStatus' => $user->payment_status
+            'hasActiveMembership' => $user->hasActiveMembership(),
+            'hasPendingMembership' => $user->hasPendingMembership()
         ]);
     }
 
@@ -158,14 +159,13 @@ class MembershipController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->payment_reference) {
-            $paymentReference = $this->generateCzechReference($user->id);
-            $user->update(['payment_reference' => $paymentReference]);
-        }
+        // Get payment reference from pending membership or generate new one
+        $pendingMembership = $user->pendingMembership();
+        $paymentReference = $pendingMembership?->payment_reference ?? $this->generateCzechReference($user->id);
 
         return view('membership::confirm-payment', [
             'user' => $user,
-            'reference' => $user->payment_reference,
+            'reference' => $paymentReference,
             'amount' => '500.00',
             'account' => env('CZECH_IBAN', 'CZ5855000000001265098001'),
             'beneficiary' => env('CZECH_BENEFICIARY', 'Sports Club s.r.o.')
@@ -179,27 +179,33 @@ class MembershipController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasRole('member')) {
+        // Check if user already has active membership (using new system)
+        if ($user->hasActiveMembership()) {
             return redirect()->route('membership.index')
                 ->with('error', 'Již jste členem klubu!');
         }
 
-        if ($user->payment_status === 'pending') {
+        // Check if user has pending membership
+        if ($user->hasPendingMembership()) {
             return redirect()->route('membership.index')
                 ->with('info', 'Vaše platba již čeká na schválení.');
         }
 
-        if (!$user->payment_reference) {
-            $paymentReference = $this->generateCzechReference($user->id);
-            $user->update(['payment_reference' => $paymentReference]);
-        }
+        // Generate payment reference
+        $paymentReference = $this->generateCzechReference($user->id);
 
-        $user->update([
-            'payment_status' => 'pending',
+        // Create new pending membership
+        Membership::create([
+            'user_id' => $user->id,
+            'type' => 'premium',
+            'status' => 'pending',
+            'payment_reference' => $paymentReference,
+            'amount' => 500.00,
+            'currency' => 'CZK',
             'payment_submitted_at' => now(),
-            'payment_verified_at' => null
         ]);
 
+        // Notify admins
         $admins = User::whereHas('roles', function($query) {
             $query->where('slug', 'administrator');
         })->get();
@@ -208,11 +214,12 @@ class MembershipController extends Controller
             $admin->notify(new PaymentReceivedNotification($user, '500.00'));
         }
 
+        // Notify user
         $user->notify(new PaymentConfirmationPendingNotification($user));
 
         Log::info("Payment confirmation submitted", [
             'user_id' => $user->id,
-            'reference' => $user->payment_reference
+            'reference' => $paymentReference
         ]);
 
         return redirect()->route('membership.index')
@@ -226,15 +233,14 @@ class MembershipController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->payment_status === 'pending') {
-            $user->update([
-                'payment_status' => 'cancelled',
-                'payment_submitted_at' => null
-            ]);
+        $pendingMembership = $user->pendingMembership();
+
+        if ($pendingMembership) {
+            $pendingMembership->cancel('Zrušeno uživatelem');
 
             Log::info("Payment cancelled by user", [
                 'user_id' => $user->id,
-                'reference' => $user->payment_reference
+                'reference' => $pendingMembership->payment_reference
             ]);
 
             return redirect()->route('membership.index')
@@ -250,10 +256,9 @@ class MembershipController extends Controller
      */
     public function adminPaymentCheck(): View
     {
-        $confirmedUsers = \App\Models\User::whereNotNull('payment_verified_at')
-            ->where('payment_status', 'verified')
-            ->with('roles')
-            ->get();
+        $confirmedUsers = User::whereHas('memberships', function($query) {
+            $query->where('status', 'active');
+        })->with('roles')->get();
 
         return view('membership::admin-payments', [
             'confirmedUsers' => $confirmedUsers
@@ -268,7 +273,7 @@ class MembershipController extends Controller
     public function status(): View
     {
         $user = Auth::user();
-        $isMember = $user->hasRole('member');
+        $isMember = $user->hasActiveMembership(); // Use new membership check
 
         return view('membership::status', compact('user', 'isMember'));
     }
@@ -282,37 +287,25 @@ class MembershipController extends Controller
     {
         $user = Auth::user();
 
-        $memberRole = Role::where('name', 'member')->first();
-
-        if (!$memberRole) {
+        // Check if already has active membership
+        if ($user->hasActiveMembership()) {
             return redirect()->route('membership.index')
-                ->with('error', 'Membership role not found. Please contact administrator.');
+                ->with('error', 'You are already a member.');
         }
 
-        if (!$user->hasRole('member')) {
-            $user->attachRole($memberRole->id);
-
-            return redirect()->route('membership.index')
-                ->with('success', 'Welcome to the club! Your membership has been activated.');
-        }
-
-        return redirect()->route('membership.index')
-            ->with('error', 'You are already a member.');
+        // For now, redirect to payment flow
+        return redirect()->route('membership.confirm-payment')
+            ->with('info', 'Please complete the payment process to become a member.');
     }
 
     public function leave(Request $request): RedirectResponse
     {
         $user = Auth::user();
 
-        $memberRole = Role::where('name', 'member')->first();
+        $activeMembership = $user->activeMembership();
 
-        if (!$memberRole) {
-            return redirect()->route('membership.index')
-                ->with('error', 'Membership role not found. Please contact administrator.');
-        }
-
-        if ($user->hasRole('member')) {
-            $user->detachRole($memberRole->id);
+        if ($activeMembership) {
+            $activeMembership->cancel('Opustil členství');
 
             return redirect()->route('membership.index')
                 ->with('success', 'Sorry to see you go! Your membership has been cancelled.');

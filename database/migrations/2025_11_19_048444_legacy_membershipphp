@@ -1,0 +1,73 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use App\Models\User;
+use App\Models\Membership;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        // Backup current payment data
+        User::whereNotNull('payment_reference')->chunk(100, function ($users) {
+            foreach ($users as $user) {
+                $user->update([
+                    'legacy_payment_reference' => $user->payment_reference,
+                    'legacy_payment_submitted_at' => $user->payment_submitted_at,
+                    'legacy_payment_verified_at' => $user->payment_verified_at,
+                ]);
+            }
+        });
+
+        // Migrate verified payments to memberships
+        User::where('payment_status', 'verified')->chunk(100, function ($users) {
+            foreach ($users as $user) {
+                Membership::create([
+                    'user_id' => $user->id,
+                    'type' => 'premium', // All current payments are for premium
+                    'status' => 'active',
+                    'payment_reference' => $user->payment_reference,
+                    'amount' => 500.00,
+                    'currency' => 'CZK',
+                    'starts_at' => $user->payment_verified_at ?? now(),
+                    'expires_at' => now()->endOfYear(), // Expire at end of current year
+                    'payment_submitted_at' => $user->payment_submitted_at,
+                    'payment_verified_at' => $user->payment_verified_at,
+                ]);
+            }
+        });
+
+        // Migrate pending payments to memberships
+        User::where('payment_status', 'pending')->chunk(100, function ($users) {
+            foreach ($users as $user) {
+                Membership::create([
+                    'user_id' => $user->id,
+                    'type' => 'premium',
+                    'status' => 'pending',
+                    'payment_reference' => $user->payment_reference,
+                    'amount' => 500.00,
+                    'currency' => 'CZK',
+                    'payment_submitted_at' => $user->payment_submitted_at,
+                ]);
+            }
+        });
+    }
+
+    public function down()
+    {
+        // Restore legacy data if needed
+        Membership::truncate();
+
+        User::whereNotNull('legacy_payment_reference')->chunk(100, function ($users) {
+            foreach ($users as $user) {
+                $user->update([
+                    'payment_reference' => $user->legacy_payment_reference,
+                    'payment_submitted_at' => $user->legacy_payment_submitted_at,
+                    'payment_verified_at' => $user->legacy_payment_verified_at,
+                ]);
+            }
+        });
+    }
+};

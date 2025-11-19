@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use jeremykenedy\LaravelRoles\Traits\HasRoleAndPermission;
 use Xoco70\LaravelTournaments\Models\Competitor;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -137,4 +138,38 @@ class User extends Authenticatable
         return $this->hasRole('trainer') || $this->hasRole('administrator');
     }
 
+    public function memberships(): HasMany
+    {
+        return $this->hasMany(Membership::class);
+    }
+
+    public function activeMembership()
+    {
+        return $this->memberships()
+            ->where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->latest()
+            ->first();
+    }
+
+    public function hasActiveMembership(): bool
+    {
+        return !is_null($this->activeMembership());
+    }
+
+    public function pendingMembership()
+    {
+        return $this->memberships()
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+    }
+
+    public function hasPendingMembership(): bool
+    {
+        return !is_null($this->pendingMembership());
+    }
 }

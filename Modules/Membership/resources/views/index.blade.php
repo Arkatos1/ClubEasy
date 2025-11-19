@@ -31,26 +31,24 @@
                 <div class="bg-gray-50 p-6 rounded-lg mb-6">
                     <h2 class="text-xl font-semibold mb-4">{{ __('Your Membership Status') }}</h2>
 
-                    @if(auth()->user()->hasRole('member'))
+                    @if(auth()->user()->hasActiveMembership())
                         <div class="flex items-center justify-between">
                             <div>
                                 <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
                                     {{ __('Active Member') }}
                                 </span>
                                 <p class="text-gray-600 mt-2">{{ __('Your membership is active. Thank you for being part of our club!') }}</p>
+                                @php $activeMembership = auth()->user()->activeMembership(); @endphp
+                                @if($activeMembership && $activeMembership->expires_at)
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        {{ __('Expires:') }} <strong>{{ $activeMembership->expires_at->format('d.m.Y') }}</strong>
+                                    </p>
+                                @endif
                             </div>
-                            <form action="{{ route('membership.leave') }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                                        onclick="return confirm('{{ __('Are you sure you want to leave the membership?') }}')">
-                                    {{ __('Leave Membership') }}
-                                </button>
-                            </form>
+                            <!-- Removed Leave Membership button -->
                         </div>
 
-                    @elseif(auth()->user()->payment_status === 'pending')
+                    @elseif(auth()->user()->hasPendingMembership())
                         <!-- PENDING PAYMENT STATUS -->
                         <div class="flex items-center justify-between">
                             <div>
@@ -60,9 +58,15 @@
                                 <p class="text-gray-600 mt-2">
                                     {{ __('Your payment has been submitted and is waiting for administrator approval.') }}
                                 </p>
-                                <p class="text-sm text-gray-500 mt-1">
-                                    {{ __('Reference number:') }} <strong>{{ auth()->user()->payment_reference }}</strong>
-                                </p>
+                                @php $pendingMembership = auth()->user()->pendingMembership(); @endphp
+                                @if($pendingMembership)
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        {{ __('Reference number:') }} <strong>{{ $pendingMembership->payment_reference }}</strong>
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ __('Submitted:') }} <strong>{{ $pendingMembership->payment_submitted_at->format('d.m.Y H:i') }}</strong>
+                                    </p>
+                                @endif
                             </div>
                             <form action="{{ route('membership.cancel-payment') }}" method="POST">
                                 @csrf
@@ -116,7 +120,7 @@
 </div>
 
 <!-- Payment Modal - ONLY SHOW IF NOT PENDING AND NOT MEMBER -->
-@if(!auth()->user()->hasRole('member') && auth()->user()->payment_status !== 'pending')
+@if(!auth()->user()->hasActiveMembership() && !auth()->user()->hasPendingMembership())
 <div id="paymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3 text-center">
@@ -166,9 +170,10 @@
                 </div>
             </div>
 
-            <div class="flex justify-between mt-4">
+            <!-- Cancel Button -->
+            <div class="mt-4">
                 <button type="button"
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded w-full"
                         onclick="closePaymentModal()">
                     {{ __('Cancel') }}
                 </button>
