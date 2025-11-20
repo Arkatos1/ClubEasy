@@ -45,7 +45,6 @@
                                     </p>
                                 @endif
                             </div>
-                            <!-- Removed Leave Membership button -->
                         </div>
 
                     @elseif(auth()->user()->hasPendingMembership())
@@ -122,13 +121,13 @@
 <!-- Payment Modal - ONLY SHOW IF NOT PENDING AND NOT MEMBER -->
 @if(!auth()->user()->hasActiveMembership() && !auth()->user()->hasPendingMembership())
 <div id="paymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3 text-center">
-            <h3 class="text-lg font-medium text-gray-900">{{ __('Become a Member') }}</h3>
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 text-center">{{ __('Become a Member') }}</h3>
 
             <!-- QR Code Payment Section -->
             <div class="mt-4">
-                <p class="text-sm text-gray-500 mb-4">{{ __('Scan the QR code to complete your membership payment') }}</p>
+                <p class="text-sm text-gray-500 mb-4 text-center">{{ __('Scan the QR code to complete your membership payment') }}</p>
 
                 <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
                     <div id="qrCodeContainer" class="flex justify-center">
@@ -157,26 +156,30 @@
                     <p class="text-xs text-gray-600 font-mono">{{ __('Variable Symbol') }}: {{ $paymentReference ?? 'N/A' }}</p>
                 </div>
 
-                <!-- Payment Confirmation Button -->
+                <!-- Direct Confirmation Form -->
+                <form action="{{ route('membership.confirm-payment') }}" method="POST" id="paymentConfirmationForm">
+                    @csrf
+
+                    <!-- Action Buttons -->
+                    <div class="flex space-x-3 mt-6">
+                        <button type="submit"
+                                class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                            <span class="mr-2">✅</span>
+                            {{ __('Confirm Payment') }}
+                        </button>
+                        <button type="button"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg transition duration-200"
+                                onclick="closePaymentModal()">
+                            {{ __('Cancel') }}
+                        </button>
+                    </div>
+                </form>
+
                 <div class="mt-4 text-center">
-                    <p class="text-sm text-gray-600 mb-3">{{ __('After making the payment') }}:</p>
-                    <a href="{{ route('membership.confirm-payment') }}"
-                       class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200">
-                        ✅ {{ __("I've Paid - Confirm Now") }}
-                    </a>
-                    <p class="text-xs text-gray-500 mt-2">
-                        {{ __("You'll confirm your payment and we'll verify it within 1-2 business days") }}
+                    <p class="text-xs text-gray-500">
+                        {{ __('After confirmation, administrators will verify your payment within 1-2 business days') }}
                     </p>
                 </div>
-            </div>
-
-            <!-- Cancel Button -->
-            <div class="mt-4">
-                <button type="button"
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded w-full"
-                        onclick="closePaymentModal()">
-                    {{ __('Cancel') }}
-                </button>
             </div>
         </div>
     </div>
@@ -199,5 +202,15 @@ window.onclick = function(event) {
         closePaymentModal();
     }
 }
+
+// Form submission handling
+document.getElementById('paymentConfirmationForm')?.addEventListener('submit', function(e) {
+    const checkbox = this.querySelector('input[name="payment_sent"]');
+    if (!checkbox.checked) {
+        e.preventDefault();
+        alert('{{ __("Please confirm that you have sent the payment") }}');
+        return false;
+    }
+});
 </script>
 @endsection

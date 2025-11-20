@@ -121,11 +121,6 @@ class PaymentAdminController extends Controller
      */
     public function rejectPayment(Request $request, Membership $membership): RedirectResponse
     {
-        if ($membership->status !== 'pending') {
-            return redirect()->route('administration.payments.pending')
-                ->with('error', __('This membership is not pending approval.'));
-        }
-
         try {
             $previousReference = $membership->payment_reference;
             $user = $membership->user;

@@ -59,7 +59,7 @@ class MembershipController extends Controller
             'amount' => $amount,
             'currency' => 'CZK',
             'account' => $iban,
-            'bank' => 'Your Bank',
+            'bank' => 'AirBank',
             'beneficiary' => $beneficiary,
             'qrData' => $qrPlatbaData,
             'isValidFormat' => $isValidFormat,
@@ -153,77 +153,72 @@ class MembershipController extends Controller
     }
 
     /**
-     * Show payment confirmation page
-     */
-    public function confirmPayment(): View
-    {
-        $user = Auth::user();
-
-        // Get payment reference from pending membership or generate new one
-        $pendingMembership = $user->pendingMembership();
-        $paymentReference = $pendingMembership?->payment_reference ?? $this->generateCzechReference($user->id);
-
-        return view('membership::confirm-payment', [
-            'user' => $user,
-            'reference' => $paymentReference,
-            'amount' => '500.00',
-            'account' => env('CZECH_IBAN', 'CZ5855000000001265098001'),
-            'beneficiary' => env('CZECH_BENEFICIARY', 'Sports Club s.r.o.')
-        ]);
-    }
-
-    /**
-     * Process payment confirmation
+     * Process payment confirmation (direct from modal)
      */
     public function processConfirmation(Request $request): RedirectResponse
     {
         $user = Auth::user();
 
-        // Check if user already has active membership (using new system)
-        if ($user->hasActiveMembership()) {
+        try {
+            // Check if user already has active membership
+            if ($user->hasActiveMembership()) {
+                return redirect()->route('membership.index')
+                    ->with('info', __('Již jste členem klubu! Děkujeme, že jste součástí našeho týmu.'));
+            }
+
+            // Check if user has pending membership
+            if ($user->hasPendingMembership()) {
+                return redirect()->route('membership.index')
+                    ->with('info', __('Vaše platba již čeká na schválení. Počkejte prosím na potvrzení administrátora.'));
+            }
+
+            // Generate payment reference
+            $paymentReference = $this->generateCzechReference($user->id);
+
+            // Create new pending membership
+            $membership = Membership::create([
+                'user_id' => $user->id,
+                'type' => 'premium',
+                'status' => 'pending',
+                'payment_reference' => $paymentReference,
+                'amount' => 500.00,
+                'currency' => 'CZK',
+                'payment_submitted_at' => now(),
+                'transaction_id' => $request->transaction_id, // Store optional transaction ID
+                'expires_at' => now()->addYear(),
+            ]);
+
+            // Notify admins
+            $admins = User::whereHas('roles', function($query) {
+                $query->where('slug', 'administrator');
+            })->get();
+
+            foreach ($admins as $admin) {
+                $admin->notify(new PaymentReceivedNotification($user, '500.00', $paymentReference));
+            }
+
+            // Notify user
+            $user->notify(new PaymentConfirmationPendingNotification($user, $paymentReference));
+
+            Log::info("Payment confirmation submitted directly from modal", [
+                'user_id' => $user->id,
+                'user_email' => $user->email,
+                'reference' => $paymentReference,
+                'transaction_id' => $request->transaction_id
+            ]);
+
             return redirect()->route('membership.index')
-                ->with('error', 'Již jste členem klubu!');
-        }
+                ->with('success', __('Děkujeme! Vaše platba byla nahlášena a čeká na schválení. O aktivaci členství vás budeme informovat do 1-2 pracovních dnů.'));
 
-        // Check if user has pending membership
-        if ($user->hasPendingMembership()) {
+        } catch (\Exception $e) {
+            Log::error("Failed to process payment confirmation", [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+
             return redirect()->route('membership.index')
-                ->with('info', 'Vaše platba již čeká na schválení.');
+                ->with('error', __('Nastala chyba při odesílání potvrzení. Zkuste to prosím znovu.'));
         }
-
-        // Generate payment reference
-        $paymentReference = $this->generateCzechReference($user->id);
-
-        // Create new pending membership
-        Membership::create([
-            'user_id' => $user->id,
-            'type' => 'premium',
-            'status' => 'pending',
-            'payment_reference' => $paymentReference,
-            'amount' => 500.00,
-            'currency' => 'CZK',
-            'payment_submitted_at' => now(),
-        ]);
-
-        // Notify admins
-        $admins = User::whereHas('roles', function($query) {
-            $query->where('slug', 'administrator');
-        })->get();
-
-        foreach ($admins as $admin) {
-            $admin->notify(new PaymentReceivedNotification($user, '500.00'));
-        }
-
-        // Notify user
-        $user->notify(new PaymentConfirmationPendingNotification($user));
-
-        Log::info("Payment confirmation submitted", [
-            'user_id' => $user->id,
-            'reference' => $paymentReference
-        ]);
-
-        return redirect()->route('membership.index')
-            ->with('success', 'Děkujeme! Vaše platba byla nahlášena a čeká na schválení. O aktivaci členství vás budeme informovat.');
     }
 
     /**
@@ -244,11 +239,11 @@ class MembershipController extends Controller
             ]);
 
             return redirect()->route('membership.index')
-                ->with('success', 'Platba byla zrušena. Můžete kdykoliv začít znovu.');
+                ->with('success', __('Platba byla zrušena. Můžete kdykoliv začít znovu.'));
         }
 
         return redirect()->route('membership.index')
-            ->with('error', 'Nemáte žádnou platbu čekající na schválení.');
+            ->with('error', __('Nemáte žádnou platbu čekající na schválení.'));
     }
 
     /**
@@ -273,7 +268,7 @@ class MembershipController extends Controller
     public function status(): View
     {
         $user = Auth::user();
-        $isMember = $user->hasActiveMembership(); // Use new membership check
+        $isMember = $user->hasActiveMembership();
 
         return view('membership::status', compact('user', 'isMember'));
     }
@@ -290,12 +285,19 @@ class MembershipController extends Controller
         // Check if already has active membership
         if ($user->hasActiveMembership()) {
             return redirect()->route('membership.index')
-                ->with('error', 'You are already a member.');
+                ->with('error', __('Již jste členem.'));
         }
 
-        // For now, redirect to payment flow
-        return redirect()->route('membership.confirm-payment')
-            ->with('info', 'Please complete the payment process to become a member.');
+        // Check if already has pending membership
+        if ($user->hasPendingMembership()) {
+            return redirect()->route('membership.index')
+                ->with('info', __('Již máte platbu čekající na schválení.'));
+        }
+
+        // For direct flow, we don't redirect to confirmation page anymore
+        // Instead, the modal will open with the QR code and confirmation form
+        return redirect()->route('membership.index')
+            ->with('info', __('Klikněte na tlačítko "Stát se členem" pro dokončení platby.'));
     }
 
     public function leave(Request $request): RedirectResponse
@@ -308,10 +310,14 @@ class MembershipController extends Controller
             $activeMembership->cancel('Opustil členství');
 
             return redirect()->route('membership.index')
-                ->with('success', 'Sorry to see you go! Your membership has been cancelled.');
+                ->with('success', __('Je nám líto, že odcházíte! Vaše členství bylo zrušeno.'));
         }
 
         return redirect()->route('membership.index')
-            ->with('error', 'You are not currently a member.');
+            ->with('error', __('Momentálně nejste členem.'));
     }
+
+    /**
+     * REMOVED: confirmPayment() method since we don't need separate page anymore
+     */
 }

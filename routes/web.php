@@ -70,8 +70,7 @@ Route::middleware(['auth', 'verified'])->prefix('membership')->name('membership.
     Route::post('/subscribe', [MembershipController::class, 'subscribe'])->name('subscribe');
     Route::post('/join', [MembershipController::class, 'join'])->name('join');
     Route::delete('/leave', [MembershipController::class, 'leave'])->name('leave');
-    Route::get('/confirm-payment', [MembershipController::class, 'confirmPayment'])->name('confirm-payment');
-    Route::post('/confirm-payment', [MembershipController::class, 'processConfirmation'])->name('process-confirmation');
+    Route::post('/confirm-payment', [MembershipController::class, 'processConfirmation'])->name('confirm-payment');
     Route::post('/cancel-payment', [MembershipController::class, 'cancelPayment'])->name('cancel-payment');
 });
 
