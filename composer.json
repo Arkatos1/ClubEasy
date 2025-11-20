@@ -9,6 +9,7 @@
         "php": "^8.2",
         "ably/ably-php": "*",
         "austintoddj/canvas": "^6.0",
+        "beyondcode/laravel-er-diagram-generator": "^5.0",
         "jeremykenedy/laravel-roles": "^11.5",
         "jeremykenedy/laravel-users": "^4.5",
         "jobmetric/laravel-package-core": "*",

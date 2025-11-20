@@ -1,0 +1,26 @@
+@startuml
+title Sports App - Hlavní Aktivita
+
+start
+
+:Uživatel otevře aplikaci;
+
+if (Uživatel je přihlášen?) then (ano)
+  :Zobrazí dashboard;
+else (ne)
+  :Zobrazí přihlašovací stránku;
+  :Uživatel se přihlásí;
+endif
+
+:Uživatel prohlíží obsah;
+
+while (Zůstat v aplikaci?)
+  :Prohlíží hráče;
+  :Prohlíží události;
+  :Spravuje profil;
+endwhile
+
+:Uživatel se odhlásí;
+
+stop
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+title Diagram Nasazení
+
+skinparam nodesep 50
+skinparam ranksep 50
+
+node "Klienti" as clients {
+  artifact "Webový prohlížeč"
+  artifact "Mobilní prohlížeč"
+}
+
+node "Webový server" as server {
+  artifact "Laravel aplikace (MVC)" as laravel
+}
+
+node "Databázový server" as db {
+  artifact "MySQL Databáze" as mysql
+}
+
+node "Úložiště" as storage
+
+node "Emailový server" as email {
+  artifact "Emailová služba" as email_service
+}
+
+' Připojení
+clients --> server : \tHTTP/S
+server --> db : \tDotazování
+server --> storage : Nahrávání a\nstahování souborů
+server --> email : \tOdesílání emailů
+@enduml

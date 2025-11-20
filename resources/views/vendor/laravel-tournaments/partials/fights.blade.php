@@ -10,8 +10,8 @@
             @if ($fight->shouldBeInFightList(false))
                 <?php
                 // Fix: Use the name attribute instead of fullName or user relationship
-                $fighter1 = optional($fight->fighter1)->name ?? "BYE";
-                $fighter2 = optional($fight->fighter2)->name ?? "BYE";
+                $fighter1 = optional($fight->fighter1)->name ?? "TBD";
+                $fighter2 = optional($fight->fighter2)->name ?? "TBD";
                 $fightId++;
                 ?>
 
