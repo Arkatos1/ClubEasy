@@ -3,7 +3,6 @@
 @section('title', __('Tournaments'))
 
 @section('template_linked_css')
-
 <style>
 .tournament-bracket #brackets-wrapper,
 .tournament-bracket #round-titles-wrapper {
@@ -167,6 +166,67 @@
 .tournament-bracket .clearfix {
     clear: both;
 }
+
+/* New styles for tournament management */
+.tournament-management {
+    margin-bottom: 2rem;
+}
+
+.tournament-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: white;
+}
+
+.tournament-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.tournament-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    border-color: #ef4444;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+.btn-warning {
+    background-color: #f59e0b;
+    border-color: #f59e0b;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-warning:hover {
+    background-color: #d97706;
+}
+
+.championship-card {
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #f9fafb;
+}
 </style>
 @endsection
 
@@ -194,10 +254,22 @@
 
             <!-- Tournament Creation Form -->
             <div class="bootstrap-form mb-8 p-6 border border-gray-200 rounded-lg">
-                <h2 class="text-xl font-semibold mb-4">{{ __('Generate New Tournament') }}</h2>
+                <h2 class="text-xl font-semibold mb-4">{{ __('Generate Tournament') }}</h2>
                 <form action="{{ route('tournaments.store') }}" method="POST">
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <label for="tournament_id" class="block text-sm font-medium text-gray-700">{{ __('Select Existing Tournament') }}</label>
+                            <select name="tournament_id" id="tournament_id"
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">{{ __('Create New Tournament') }}</option>
+                                @foreach($tournaments as $tournament)
+                                    <option value="{{ $tournament->id }}">{{ $tournament->name }} ({{ $tournament->created_at->format('M j, Y') }})</option>
+                                @endforeach
+                            </select>
+                            <p class="text-sm text-gray-500 mt-1">Leave empty to create a new tournament</p>
+                        </div>
+
                         <div>
                             <label for="numFighters" class="block text-sm font-medium text-gray-700">{{ __('Number of Fighters/Teams') }}</label>
                             <input type="number" name="numFighters" id="numFighters"
@@ -238,86 +310,132 @@
                 </form>
             </div>
 
-            <!-- Tournament Display -->
-            @if($tournament && $tournament->championships->count() > 0)
-                @foreach($tournament->championships as $championship)
-                    <div class="mb-8 p-6 border border-gray-200 rounded-lg">
-                        <h2 class="text-xl font-semibold mb-4">{{ $championship->name ?? __('Championship') }}</h2>
+            <!-- Existing Tournaments -->
+            <div class="tournament-management">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('Existing Tournaments') }}</h2>
 
-                        <!-- Championship Info -->
-                        <div class="mb-4">
-                            <h3 class="text-lg font-medium mb-2">{{ __('Championship Details') }}</h3>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                <div>
-                                    <span class="font-medium">{{ __('Type') }}:</span>
-                                    {{ $championship->category->isTeam ? __('Team') : __('Individual') }}
-                                </div>
-                                <div>
-                                    <span class="font-medium">{{ $championship->category->isTeam ? __('Teams') : __('Fighters') }}:</span>
-                                    {{ $championship->category->isTeam ? $championship->teams->count() : $championship->competitors->count() }}
-                                </div>
-                                <div>
-                                    <span class="font-medium">{{ __('Tree Type') }}:</span>
-                                    @if($championship->settings && $championship->settings->treeType)
-                                        {{ $championship->settings->treeType == 1 ? __('Single Elimination') :
-                                        ($championship->settings->treeType == 2 ? __('Single Elimination with Preliminary') : __('Playoff')) }}
-                                    @else
-                                        {{ __('Not Set') }}
-                                    @endif
-                                </div>
-                                <div>
-                                    <span class="font-medium">{{ __('Preliminary') }}:</span>
-                                    {{ $championship->settings && $championship->settings->hasPreliminary ? __('Yes') : __('No') }}
+                @if($tournaments->count() > 0)
+                    @foreach($tournaments as $tournament)
+                        <div class="tournament-card">
+                            <div class="tournament-header">
+                                <h3 class="text-xl font-semibold">{{ $tournament->name }}</h3>
+                                <div class="tournament-actions">
+                                    <form action="{{ route('tournaments.destroy', $tournament) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this tournament and all its championships?')">
+                                        @csrf
+                                        <button type="submit" class="btn-danger text-sm">
+                                            Delete Tournament
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Fighters List -->
-                        <div class="mb-6">
-                            <h3 class="text-lg font-medium mb-2">
-                                {{ $championship->category->isTeam ? __('Teams') : __('Competitors') }}
-                            </h3>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                @if($championship->category->isTeam)
-                                    @foreach($championship->teams as $team)
-                                        <div class="bg-gray-100 p-2 rounded text-sm">
-                                            {{ $team->name ?? __('Unknown Team') }}
+                            <p class="text-gray-600 mb-4">
+                                Created: {{ $tournament->created_at->format('M j, Y g:i A') }} |
+                                Championships: {{ $tournament->championships->count() }}
+                            </p>
+
+                            @if($tournament->championships->count() > 0)
+                                @foreach($tournament->championships as $championship)
+                                    <div class="championship-card">
+                                        <div class="flex justify-between items-center mb-3">
+                                            <h4 class="text-lg font-medium">{{ $championship->name }}</h4>
+                                            <form action="{{ route('championships.destroy', $championship) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this championship?')">
+                                                @csrf
+                                                <button type="submit" class="btn-warning text-sm">
+                                                    Delete Championship
+                                                </button>
+                                            </form>
                                         </div>
-                                    @endforeach
-                                @else
-                                    @foreach($championship->competitors as $competitor)
-                                        <div class="bg-gray-100 p-2 rounded text-sm">
-                                            {{ $competitor->user->name ?? __('Unknown Competitor') }}
+
+                                        <!-- Championship Info -->
+                                        <div class="mb-4">
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                                <div>
+                                                    <span class="font-medium">{{ __('Type') }}:</span>
+                                                    {{ $championship->category->isTeam ? __('Team') : __('Individual') }}
+                                                </div>
+                                                <div>
+                                                    <span class="font-medium">{{ $championship->category->isTeam ? __('Teams') : __('Fighters') }}:</span>
+                                                    {{ $championship->category->isTeam ? $championship->teams->count() : $championship->competitors->count() }}
+                                                </div>
+                                                <div>
+                                                    <span class="font-medium">{{ __('Tree Type') }}:</span>
+                                                    @if($championship->settings && $championship->settings->treeType)
+                                                        {{ $championship->settings->treeType == 1 ? __('Single Elimination') :
+                                                        ($championship->settings->treeType == 2 ? __('Single Elimination with Preliminary') : __('Playoff')) }}
+                                                    @else
+                                                        {{ __('Not Set') }}
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <span class="font-medium">{{ __('Preliminary') }}:</span>
+                                                    {{ $championship->settings && $championship->settings->hasPreliminary ? __('Yes') : __('No') }}
+                                                </div>
+                                            </div>
                                         </div>
-                                    @endforeach
-                                @endif
-                            </div>
+
+                                        <!-- Fighters List -->
+                                        <div class="mb-4">
+                                            <h5 class="text-md font-medium mb-2">
+                                                {{ $championship->category->isTeam ? __('Teams') : __('Competitors') }}
+                                            </h5>
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                                @if($championship->category->isTeam)
+                                                    @foreach($championship->teams as $team)
+                                                        <div class="bg-gray-100 p-2 rounded text-sm">
+                                                            {{ $team->name ?? __('Unknown Team') }}
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    @foreach($championship->competitors as $competitor)
+                                                        <div class="bg-gray-100 p-2 rounded text-sm">
+                                                            {{ $competitor->user->name ?? __('Unknown Competitor') }}
+                                                        </div>
+                                                    @endforeach
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <!-- Tournament Trees -->
+                                        @if($championship->fightersGroups && $championship->fightersGroups->count() > 0)
+                                            <div class="space-y-8 tournament-bracket">
+                                                <!-- Single Elimination Tree -->
+                                                <div>
+                                                    <h5 class="text-lg font-medium mb-4">{{ __('Single Elimination Tree') }}</h5>
+                                                    @include('laravel-tournaments::partials.tree.singleElimination', [
+                                                        'championship' => $championship,
+                                                        'hasPreliminary' => $championship->settings && $championship->settings->hasPreliminary
+                                                    ])
+                                                </div>
+
+                                                <!-- Fights List -->
+                                                <div>
+                                                    <h5 class="text-lg font-medium mb-4">{{ __('Fights Schedule') }}</h5>
+                                                    @include('laravel-tournaments::partials.fights', [
+                                                        'championship' => $championship
+                                                    ])
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                                                No tournament tree generated yet for this championship.
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="bg-gray-100 p-4 rounded text-sm">
+                                    No championships in this tournament yet.
+                                </div>
+                            @endif
                         </div>
-
-                        <!-- Tournament Trees -->
-                        @if($championship->fightersGroups && $championship->fightersGroups->count() > 0)
-                            <div class="space-y-8 tournament-bracket">
-                                <!-- Single Elimination Tree -->
-                                <div>
-                                    <h3 class="text-lg font-medium mb-4">{{ __('Single Elimination Tree') }}</h3>
-                                    @include('laravel-tournaments::partials.tree.singleElimination', [
-                                        'championship' => $championship,
-                                        'hasPreliminary' => $championship->settings && $championship->settings->hasPreliminary
-                                    ])
-                                </div>
-
-                                <!-- Fights List -->
-                                <div>
-                                    <h3 class="text-lg font-medium mb-4">{{ __('Fights Schedule') }}</h3>
-                                    @include('laravel-tournaments::partials.fights', [
-                                        'championship' => $championship
-                                    ])
-                                </div>
-                            </div>
-                        @endif
+                    @endforeach
+                @else
+                    <div class="bg-gray-100 p-6 rounded-lg text-center">
+                        <p class="text-gray-600">No tournaments created yet. Generate your first tournament above!</p>
                     </div>
-                @endforeach
-            @endif
+                @endif
+            </div>
         </div>
     </div>
 </div>

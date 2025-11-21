@@ -20,51 +20,150 @@ class TreeController extends Controller
 {
     /**
      * Display a listing of trees.
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index()
     {
-        $tournament = Tournament::with([
+        $tournaments = Tournament::with([
             'championships.settings',
             'championships.category',
             'championships.competitors.user',
-            'championships.teams'
-        ])->first();
+            'championships.teams',
+            'championships.fightersGroups.fights'
+        ])->latest()->get();
 
-        return view('tournaments.index')
-            ->with('tournament', $tournament);
+        return view('tournaments.index', compact('tournaments'));
     }
 
     /**
      * Build Tree.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
-        $this->deleteEverything();
+        $request->validate([
+            'numFighters' => 'required|integer|min:2|max:128',
+            'tree_type' => 'required|integer|in:1,2,3',
+            'isTeam' => 'sometimes|boolean',
+            'tournament_id' => 'nullable|exists:tournament,id'
+        ]);
+
+        // If tournament_id is provided, use existing tournament
+        if ($request->tournament_id) {
+            $tournament = Tournament::find($request->tournament_id);
+        } else {
+            // Clean existing data for new tournaments
+            $this->cleanChampionshipData();
+        }
+
         $numFighters = $request->numFighters;
         $isTeam = $request->isTeam ?? 0;
 
-        $championship = $this->provisionObjects($request, $isTeam, $numFighters);
-        $generation = $championship->chooseGenerationStrategy();
-
         try {
-            $generation->run();
-        } catch (TreeGenerationException $e) {
-            return redirect()->back()
-                ->withErrors([$e->getMessage()]);
-        }
+            if (isset($tournament)) {
+                $championship = $this->addToExistingTournament($tournament, $request, $isTeam, $numFighters);
+            } else {
+                $championship = $this->createNewTournament($request, $isTeam, $numFighters);
+            }
 
-        return back()
-            ->with('success', 'Tournament tree generated successfully!')
-            ->with('numFighters', $numFighters)
-            ->with('isTeam', $isTeam);
+            $generation = $championship->chooseGenerationStrategy();
+            $generation->run();
+
+            \Log::info('Tournament tree generated successfully', [
+                'championship_id' => $championship->id,
+                'num_fighters' => $numFighters,
+                'is_team' => $isTeam,
+                'tree_type' => $request->tree_type
+            ]);
+
+            return back()->with('success', 'Tournament tree generated successfully!');
+
+        } catch (TreeGenerationException $e) {
+            \Log::error('Tree generation failed', ['error' => $e->getMessage()]);
+            return redirect()->back()->withErrors(['Tree generation failed: ' . $e->getMessage()]);
+        } catch (\Exception $e) {
+            \Log::error('Unexpected error during tree generation', ['error' => $e->getMessage()]);
+            return redirect()->back()->withErrors(['Unexpected error: ' . $e->getMessage()]);
+        }
     }
 
-    private function deleteEverything()
+    /**
+     * Create a new tournament with championship
+     */
+    protected function createNewTournament(Request $request, $isTeam, $numFighters)
+    {
+        // Clean existing data first
+        $this->cleanChampionshipData();
+
+        // Create unique tournament name
+        $tournamentName = ($isTeam ? 'Team' : 'Individual') . ' Tournament - ' . now()->format('M j, Y H:i');
+
+        // Create tournament
+        $tournament = Tournament::create([
+            'name' => $tournamentName,
+            'slug' => Str::slug($tournamentName),
+            'dateIni' => now(),
+            'dateFin' => now()->addDays(3),
+            'level_id' => 1,
+            'type' => 1,
+            'venue_id' => $this->getOrCreateVenue(),
+            'user_id' => $this->getOrCreateUser(),
+        ]);
+
+        return $this->createChampionship($tournament, $request, $isTeam, $numFighters);
+    }
+
+    /**
+     * Add championship to existing tournament
+     */
+    protected function addToExistingTournament(Tournament $tournament, Request $request, $isTeam, $numFighters)
+    {
+        // Clean only data for this tournament
+        $this->cleanTournamentData($tournament->id);
+
+        return $this->createChampionship($tournament, $request, $isTeam, $numFighters);
+    }
+
+    /**
+     * Create championship for tournament
+     */
+    protected function createChampionship(Tournament $tournament, Request $request, $isTeam, $numFighters)
+    {
+        // Get or create category
+        $category = Category::firstOrCreate(
+            ['isTeam' => $isTeam],
+            ['name' => $isTeam ? 'Team Category' : 'Individual Category']
+        );
+
+        // Create championship with unique name
+        $championshipName = ($isTeam ? 'Team' : 'Individual') . ' Championship - ' . now()->format('H:i:s');
+
+        $championship = Championship::create([
+            'tournament_id' => $tournament->id,
+            'category_id' => $category->id,
+            'name' => $championshipName
+        ]);
+
+        // Add fighters/teams
+        if ($isTeam) {
+            $this->createTeams($championship, $numFighters);
+        } else {
+            $this->createCompetitors($championship, $numFighters);
+        }
+
+        // Create settings
+        ChampionshipSettings::create([
+            'championship_id' => $championship->id,
+            'treeType' => $request->tree_type ?? 1,
+            'hasPreliminary' => $request->hasPreliminary ?? 0,
+            'preliminaryGroupSize' => $request->preliminary_group_size ?? 3,
+            'fightingAreas' => $request->fighting_areas ?? 1,
+            'limitByEntity' => $request->limit_by_field ?? 0,
+            'teamSize' => $request->team_size ?? 1,
+        ]);
+
+        return $championship->fresh(['settings', 'category', 'fightersGroups.fights', 'competitors', 'teams']);
+    }
+
+    private function cleanChampionshipData()
     {
         DB::table('fight')->delete();
         DB::table('fighters_groups')->delete();
@@ -74,142 +173,243 @@ class TreeController extends Controller
         DB::table('team')->delete();
     }
 
-    /**
-     * @param Request $request
-     * @param $isTeam
-     * @param $numFighters
-     *
-     * @return Championship
-     */
-    protected function provisionObjects(Request $request, $isTeam, $numFighters)
-{
-    // First, create a tournament if none exists
-    $tournament = Tournament::first();
-    if (!$tournament) {
-        $tournament = Tournament::create([
-            'name' => 'Demo Tournament',
-            'slug' => Str::slug('Demo Tournament'),
-            'dateIni' => now(),
-            'dateFin' => now()->addDays(3),
-            'level_id' => 1,
-            'type' => 1,
-            'venue_id' => Venue::first()->id,
-            'user_id' => User::first()->id,
-        ]);
+    private function cleanTournamentData($tournamentId)
+    {
+        // Get all championships for this tournament
+        $championshipIds = Championship::where('tournament_id', $tournamentId)->pluck('id');
+
+        if ($championshipIds->count() > 0) {
+            DB::table('fight')->whereIn('fighters_group_id', function($query) use ($championshipIds) {
+                $query->select('id')->from('fighters_groups')->whereIn('championship_id', $championshipIds);
+            })->delete();
+
+            DB::table('fighters_groups')->whereIn('championship_id', $championshipIds)->delete();
+            DB::table('fighters_group_competitor')->whereIn('fighters_group_id', function($query) use ($championshipIds) {
+                $query->select('id')->from('fighters_groups')->whereIn('championship_id', $championshipIds);
+            })->delete();
+            DB::table('fighters_group_team')->whereIn('fighters_group_id', function($query) use ($championshipIds) {
+                $query->select('id')->from('fighters_groups')->whereIn('championship_id', $championshipIds);
+            })->delete();
+            DB::table('competitor')->whereIn('championship_id', $championshipIds)->delete();
+            DB::table('team')->whereIn('championship_id', $championshipIds)->delete();
+            DB::table('championship_settings')->whereIn('championship_id', $championshipIds)->delete();
+
+            // Delete the championships
+            Championship::where('tournament_id', $tournamentId)->delete();
+        }
     }
 
-    // Get the appropriate category
-    $category = $isTeam
-        ? Category::where('isTeam', 1)->first()
-        : Category::where('isTeam', 0)->first();
+    /**
+     * Get or create venue
+     */
+    protected function getOrCreateVenue()
+    {
+        try {
+            $venue = Venue::first();
+            if (!$venue) {
+                $venue = Venue::create([
+                    'venue_name' => 'Default Venue',
+                    'city' => 'Default City',
+                ]);
+            }
+            return $venue->id;
+        } catch (\Exception $e) {
+            return 1;
+        }
+    }
 
-    // Create or get championship
-    $championship = Championship::firstOrCreate([
-        'tournament_id' => $tournament->id,
-        'category_id' => $category->id,
-    ], [
-        'name' => ($isTeam ? 'Team' : 'Individual') . ' Championship'
-    ]);
+    /**
+     * Get or create user
+     */
+    protected function getOrCreateUser()
+    {
+        try {
+            $user = User::first();
+            if (!$user) {
+                $user = User::create([
+                    'name' => 'Admin User',
+                    'email' => 'admin@example.com',
+                    'password' => bcrypt('password'),
+                ]);
+            }
+            return $user->id;
+        } catch (\Exception $e) {
+            return 1;
+        }
+    }
 
-    if ($isTeam) {
-        // Create teams
+    /**
+     * Create teams for the championship
+     */
+    protected function createTeams(Championship $championship, $numFighters)
+    {
         for ($i = 1; $i <= $numFighters; $i++) {
             Team::create([
                 'championship_id' => $championship->id,
                 'name' => 'Team ' . $i,
-                'short_id' => $i  // Changed from 'T'.$i to just $i
+                'short_id' => $i
             ]);
-        }
-    } else {
-        // Get users who are not already competitors in this championship
-        $existingCompetitorUserIds = Competitor::where('championship_id', $championship->id)
-            ->pluck('user_id')
-            ->toArray();
-
-        $availableUsers = User::whereNotIn('id', $existingCompetitorUserIds)
-            ->limit($numFighters)
-            ->get();
-
-        $usersNeeded = $numFighters - $availableUsers->count();
-
-        // Create new users if we don't have enough
-        if ($usersNeeded > 0) {
-            $newUsers = User::factory($usersNeeded)->create();
-            $availableUsers = $availableUsers->merge($newUsers);
-        }
-
-        // Create competitors - use the correct approach
-        foreach ($availableUsers as $index => $user) {
-            $competitor = new Competitor();
-            $competitor->championship_id = $championship->id; // Correct database column
-            $competitor->user_id = $user->id;
-            $competitor->confirmed = 1;
-            $competitor->short_id = $index + 1;
-            $competitor->save();
-
         }
     }
 
-    // Update championship settings
-    $championship->settings()->updateOrCreate(
-        ['championship_id' => $championship->id],
-        [
-            'treeType' => $request->tree_type ?? 1,
-            'hasPreliminary' => $request->hasPreliminary ?? 0,
-            'preliminaryGroupSize' => $request->preliminary_group_size ?? 3,
-            'fightingAreas' => $request->fighting_areas ?? 1,
-            'limitByEntity' => $request->limit_by_field ?? 0,
-            'teamSize' => $request->team_size ?? 1,
-        ]
-    );
-
-    return $championship->fresh(['settings', 'category']);
-}
     /**
-     * @param Request $request
-     * @param Championship $championship
-     * @return \Illuminate\Http\RedirectResponse
+     * Create competitors for the championship - USING ACTUAL USERS
+     */
+    protected function createCompetitors(Championship $championship, $numFighters)
+    {
+        // Get available users from the database
+        $availableUsers = User::inRandomOrder()->limit($numFighters)->get();
+
+        // If we don't have enough users, create some new ones
+        if ($availableUsers->count() < $numFighters) {
+            $usersNeeded = $numFighters - $availableUsers->count();
+            \Log::info("Need to create {$usersNeeded} new users");
+
+            for ($i = 0; $i < $usersNeeded; $i++) {
+                $newUserNumber = $availableUsers->count() + $i + 1;
+                User::create([
+                    'name' => 'Competitor ' . $newUserNumber,
+                    'email' => 'competitor' . $newUserNumber . '@example.com',
+                    'password' => bcrypt('password'),
+                    'email_verified_at' => now(),
+                ]);
+            }
+
+            // Get all available users again (including newly created ones)
+            $availableUsers = User::inRandomOrder()->limit($numFighters)->get();
+        }
+
+        \Log::info("Creating {$availableUsers->count()} competitors for championship {$championship->id}");
+
+        // Create competitors using actual users
+        foreach ($availableUsers as $index => $user) {
+            \Log::info("Adding user as competitor: {$user->name} (ID: {$user->id})");
+
+            DB::table('competitor')->insert([
+                'championship_id' => $championship->id,
+                'user_id' => $user->id,
+                'short_id' => $index + 1,
+                'confirmed' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        \Log::info("Successfully created {$availableUsers->count()} competitors");
+    }
+
+    /**
+     * Update fight results
      */
     public function update(Request $request, Championship $championship)
     {
-        $numFighter = 0;
-        $query = FightersGroup::with('fights')
-            ->where('championship_id', $championship->id);
+        try {
+            $numFighter = 0;
+            $query = FightersGroup::with('fights')
+                ->where('championship_id', $championship->id);
 
-        $fighters = $request->singleElimination_fighters ?? [];
-        $scores = $request->score ?? [];
+            $fighters = $request->singleElimination_fighters ?? [];
+            $scores = $request->score ?? [];
 
-        if ($championship->hasPreliminary()) {
-            $query = $query->where('round', '>', 1);
-            $fighters = $request->preliminary_fighters ?? [];
-        }
-
-        $groups = $query->get();
-
-        foreach ($groups as $group) {
-            foreach ($group->fights as $fight) {
-                if (isset($fighters[$numFighter])) {
-                    $fight->c1 = $fighters[$numFighter];
-                    $fight->winner_id = $this->getWinnerId($fighters, $scores, $numFighter);
-                    $numFighter++;
-                }
-
-                if (isset($fighters[$numFighter])) {
-                    $fight->c2 = $fighters[$numFighter];
-                    if ($fight->winner_id == null) {
-                        $fight->winner_id = $this->getWinnerId($fighters, $scores, $numFighter);
-                    }
-                    $numFighter++;
-                }
-                $fight->save();
+            if ($championship->hasPreliminary()) {
+                $query = $query->where('round', '>', 1);
+                $fighters = $request->preliminary_fighters ?? [];
             }
-        }
 
-        return back()->with('success', 'Fight results updated successfully!');
+            $groups = $query->get();
+
+            foreach ($groups as $group) {
+                foreach ($group->fights as $fight) {
+                    if (isset($fighters[$numFighter])) {
+                        $fight->c1 = $fighters[$numFighter];
+                        $fight->winner_id = $this->getWinnerId($fighters, $scores, $numFighter);
+                        $numFighter++;
+                    }
+
+                    if (isset($fighters[$numFighter])) {
+                        $fight->c2 = $fighters[$numFighter];
+                        if ($fight->winner_id == null) {
+                            $fight->winner_id = $this->getWinnerId($fighters, $scores, $numFighter);
+                        }
+                        $numFighter++;
+                    }
+                    $fight->save();
+                }
+            }
+
+            return back()->with('success', 'Fight results updated successfully!');
+
+        } catch (\Exception $e) {
+            \Log::error('Error updating fight results', [
+                'championship_id' => $championship->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return back()->withErrors(['Error updating fights: ' . $e->getMessage()]);
+        }
     }
 
     private function getWinnerId($fighters, $scores, $numFighter)
     {
-        return $scores[$numFighter] != null ? $fighters[$numFighter] : null;
+        return isset($scores[$numFighter]) && $scores[$numFighter] != null
+            ? $fighters[$numFighter]
+            : null;
+    }
+
+    /**
+     * Delete a tournament
+     */
+    public function destroyTournament(Tournament $tournament)
+    {
+        try {
+            $tournamentName = $tournament->name;
+            $this->cleanTournamentData($tournament->id);
+            $tournament->delete();
+
+            return back()->with('success', "Tournament '{$tournamentName}' deleted successfully!");
+        } catch (\Exception $e) {
+            \Log::error('Error deleting tournament', ['error' => $e->getMessage()]);
+            return back()->withErrors(['Error deleting tournament: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Delete a championship
+     */
+    public function destroyChampionship(Championship $championship)
+    {
+        try {
+            $championshipName = $championship->name;
+            $tournamentId = $championship->tournament_id;
+
+        // Clean championship data
+        DB::table('fight')->whereIn('fighters_group_id', function($query) use ($championship) {
+            $query->select('id')->from('fighters_groups')->where('championship_id', $championship->id);
+        })->delete();
+
+        DB::table('fighters_groups')->where('championship_id', $championship->id)->delete();
+        DB::table('fighters_group_competitor')->whereIn('fighters_group_id', function($query) use ($championship) {
+            $query->select('id')->from('fighters_groups')->where('championship_id', $championship->id);
+        })->delete();
+        DB::table('fighters_group_team')->whereIn('fighters_group_id', function($query) use ($championship) {
+            $query->select('id')->from('fighters_groups')->where('championship_id', $championship->id);
+        })->delete();
+        DB::table('competitor')->where('championship_id', $championship->id)->delete();
+        DB::table('team')->where('championship_id', $championship->id)->delete();
+        DB::table('championship_settings')->where('championship_id', $championship->id)->delete();
+
+        $championship->delete();
+
+        // Check if tournament has any other championships
+        $remainingChampionships = Championship::where('tournament_id', $tournamentId)->count();
+        if ($remainingChampionships == 0) {
+            Tournament::where('id', $tournamentId)->delete();
+        }
+
+            return back()->with('success', "Championship '{$championshipName}' deleted successfully!");
+        } catch (\Exception $e) {
+            \Log::error('Error deleting championship', ['error' => $e->getMessage()]);
+            return back()->withErrors(['Error deleting championship: ' . $e->getMessage()]);
+        }
     }
 }

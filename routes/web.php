@@ -22,6 +22,8 @@ Route::get('/topic/{slug}', [HomeController::class, 'topic'])->name('blog.topic'
 Route::get('/tournaments', [TreeController::class, 'index'])->name('tournaments.index');
 Route::post('/tournaments', [TreeController::class, 'store'])->name('tournaments.store');
 Route::put('/tournaments/{championship}', [TreeController::class, 'update'])->name('tournaments.update');
+Route::post('/tournaments/{tournament}/delete', [TreeController::class, 'destroyTournament'])->name('tournaments.destroy');
+Route::post('/championships/{championship}/delete', [TreeController::class, 'destroyChampionship'])->name('championships.destroy');
 
 // Resource Routes
 Route::resource('players', PlayerController::class);

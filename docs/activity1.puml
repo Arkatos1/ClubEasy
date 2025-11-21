@@ -1,26 +1,31 @@
 @startuml
-title Sports App - Hlavní Aktivita
+title Registrace Uživatele
 
 start
 
-:Uživatel otevře aplikaci;
+:Uživatel otevře registrační stránku;
+:Vyplní jméno;
+:Vyplní email;
+:Vyplní heslo;
 
-if (Uživatel je přihlášen?) then (ano)
-  :Zobrazí dashboard;
+if (Souhlas se zpracováním osobních údajů?) then (ano)
+  :Odeslání registračního formuláře;
 else (ne)
-  :Zobrazí přihlašovací stránku;
-  :Uživatel se přihlásí;
+  :Zobrazení chyby - souhlas je vyžadován;
+  stop
 endif
 
-:Uživatel prohlíží obsah;
+:Validace vstupních dat;
 
-while (Zůstat v aplikaci?)
-  :Prohlíží hráče;
-  :Prohlíží události;
-  :Spravuje profil;
-endwhile
-
-:Uživatel se odhlásí;
+if (Data jsou platná?) then (ano)
+  :Vytvoření uživatelského účtu;
+  :Přiřazení role "User";
+  :Automatické přihlášení;
+  :Zobrazení domovské stránky;
+else (ne)
+  :Zobrazení chybových hlášek;
+  :Návrat na registrační formulář;
+endif
 
 stop
 @enduml
