@@ -257,16 +257,16 @@ class TreeController extends Controller
      */
     protected function createCompetitors(Championship $championship, $numFighters)
     {
-        // Get available users from the database
-        $availableUsers = User::inRandomOrder()->limit($numFighters)->get();
+        // Get ALL available users from the database
+        $allUsers = User::all();
 
         // If we don't have enough users, create some new ones
-        if ($availableUsers->count() < $numFighters) {
-            $usersNeeded = $numFighters - $availableUsers->count();
+        if ($allUsers->count() < $numFighters) {
+            $usersNeeded = $numFighters - $allUsers->count();
             \Log::info("Need to create {$usersNeeded} new users");
 
             for ($i = 0; $i < $usersNeeded; $i++) {
-                $newUserNumber = $availableUsers->count() + $i + 1;
+                $newUserNumber = $allUsers->count() + $i + 1;
                 User::create([
                     'name' => 'Competitor ' . $newUserNumber,
                     'email' => 'competitor' . $newUserNumber . '@example.com',
@@ -275,14 +275,19 @@ class TreeController extends Controller
                 ]);
             }
 
-            // Get all available users again (including newly created ones)
-            $availableUsers = User::inRandomOrder()->limit($numFighters)->get();
+            // Get all users again (including newly created ones)
+            $allUsers = User::all();
         }
 
-        \Log::info("Creating {$availableUsers->count()} competitors for championship {$championship->id}");
+        // Select random users from ALL available users
+        $selectedUsers = $allUsers->count() > $numFighters
+            ? $allUsers->random($numFighters)
+            : $allUsers;
 
-        // Create competitors using actual users
-        foreach ($availableUsers as $index => $user) {
+        \Log::info("Creating {$selectedUsers->count()} competitors for championship {$championship->id}");
+
+        // Create competitors using selected users
+        foreach ($selectedUsers as $index => $user) {
             \Log::info("Adding user as competitor: {$user->name} (ID: {$user->id})");
 
             DB::table('competitor')->insert([
@@ -295,7 +300,7 @@ class TreeController extends Controller
             ]);
         }
 
-        \Log::info("Successfully created {$availableUsers->count()} competitors");
+        \Log::info("Successfully created {$selectedUsers->count()} competitors");
     }
 
     /**
