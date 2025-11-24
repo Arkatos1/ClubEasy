@@ -333,6 +333,7 @@ class TreeController extends Controller
             'slug' => $slug,
             'dateIni' => $dateIni,
             'dateFin' => $dateFin,
+            'registerDateLimit' => $dateIni,
             'level_id' => 1,
             'type' => 1,
             'venue_id' => $this->getOrCreateVenue(),

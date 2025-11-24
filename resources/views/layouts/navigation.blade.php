@@ -16,11 +16,6 @@
                         <a href="{{ route('membership.index') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('membership*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Membership') }}</a>
                     @endif
 
-                    <!-- Trainer-specific tabs -->
-                    @if(auth()->user()->hasRole('trainer') || auth()->user()->hasRole('administrator'))
-                        <a href="{{ route('trainer.dashboard') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('trainer*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Trainer Panel') }}</a>
-                    @endif
-
                     <!-- Single Admin tab -->
                     @if(auth()->user()->hasRole('administrator'))
                         <a href="{{ url('/administration') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('administration*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">Administrace</a>
