@@ -19,7 +19,7 @@
                             $dateIni = \Carbon\Carbon::parse($championship->tournament->dateIni);
                             $dateFin = \Carbon\Carbon::parse($championship->tournament->dateFin);
                         @endphp
-                        {{ $dateIni->format('d.m.Y') }} - {{ $dateFin->format('d.m.Y') }}
+                        {{ $dateIni->format('d.m.Y H:i') }} - {{ $dateFin->format('d.m.Y H:i') }}
                     </p>
                 </div>
 

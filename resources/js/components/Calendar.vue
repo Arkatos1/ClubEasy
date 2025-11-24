@@ -22,6 +22,18 @@ const calendarOptions = ref({
   initialView: 'dayGridMonth',
   weekends: true,
   events: '/api/calendar-events',
+
+  timeZone: 'Europe/Prague',
+  eventTimeFormat: {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    meridiem: false
+  },
+
+  displayEventTime: true,
+  displayEventEnd: true,
+
   headerToolbar: {
     left: 'prev,next today',
     center: 'title',
@@ -40,5 +52,14 @@ const calendarOptions = ref({
   moreLinkText: 'více',
   weekText: 'Týd.',
   weekTextLong: 'Týden',
+
+  views: {
+    timeGrid: {
+      allDaySlot: false
+    },
+    dayGridMonth: {
+      // Month view settings
+    }
+  }
 });
 </script>

@@ -59,7 +59,7 @@
                                                     $dateIni = \Carbon\Carbon::parse($tournament->dateIni);
                                                     $dateFin = \Carbon\Carbon::parse($tournament->dateFin);
                                                 @endphp
-                                                {{ $dateIni->format('d.m.Y') }} - {{ $dateFin->format('d.m.Y') }}
+                                                {{ $dateIni->format('d.m.Y H:i') }} - {{ $dateFin->format('d.m.Y H:i') }}
                                             </p>
 
                                             <div class="space-y-2 mb-4">
@@ -152,7 +152,7 @@
                                                     $dateIni = \Carbon\Carbon::parse($tournament->dateIni);
                                                     $dateFin = \Carbon\Carbon::parse($tournament->dateFin);
                                                 @endphp
-                                                {{ $dateIni->format('d.m.Y') }} - {{ $dateFin->format('d.m.Y') }}
+                                                {{ $dateIni->format('d.m.Y H:i') }} - {{ $dateFin->format('d.m.Y H:i') }}
                                             </p>
 
                                             <div class="space-y-2 mb-4">

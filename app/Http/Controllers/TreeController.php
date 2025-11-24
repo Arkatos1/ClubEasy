@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -318,14 +319,18 @@ class TreeController extends Controller
             $tournamentName = "{$tournamentType} - {$day}. {$month} {$year} {$time}";
         }
 
-        // Create date objects from form inputs
-        $dateIni = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->dateIni_date . ' ' . $request->dateIni_time);
-        $dateFin = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->dateFin_date . ' ' . $request->dateFin_time);
+        // Create date objects from form inputs - FIX TIMEZONE ISSUE
+        $dateIni = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->dateIni_date . ' ' . $request->dateIni_time, config('app.timezone'));
+        $dateFin = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->dateFin_date . ' ' . $request->dateFin_time, config('app.timezone'));
+
+        // Generate unique slug by adding timestamp to prevent duplicates
+        $baseSlug = Str::slug($tournamentName);
+        $slug = $baseSlug . '-' . time();
 
         // Create tournament
         $tournament = Tournament::create([
             'name' => $tournamentName,
-            'slug' => Str::slug($tournamentName),
+            'slug' => $slug,
             'dateIni' => $dateIni,
             'dateFin' => $dateFin,
             'level_id' => 1,
@@ -333,6 +338,23 @@ class TreeController extends Controller
             'venue_id' => $this->getOrCreateVenue(),
             'user_id' => $this->getOrCreateUser(),
         ]);
+
+        // CREATE EVENT FOR CALENDAR - One event per tournament
+        try {
+            Event::create([
+                'title' => $tournamentName,
+                'description' => 'Tournament',
+                'start_date' => $dateIni,
+                'end_date' => $dateFin,
+            ]);
+            \Log::info("Calendar event created for tournament: {$tournamentName}");
+        } catch (\Exception $e) {
+            \Log::error('Failed to create calendar event', [
+                'tournament_name' => $tournamentName,
+                'error' => $e->getMessage()
+            ]);
+            // Don't throw error - tournament creation should continue even if event creation fails
+        }
 
         return $this->createChampionship($tournament, $request, $isTeam, $numFighters);
     }
@@ -522,6 +544,32 @@ class TreeController extends Controller
      */
     protected function addToExistingTournament(Tournament $tournament, Request $request, $isTeam, $numFighters)
     {
+        // Only create event if this is the first championship being added to the tournament
+        $existingChampionshipsCount = $tournament->championships()->count();
+
+        if ($existingChampionshipsCount == 0) {
+            // CREATE EVENT FOR CALENDAR - Only if no championships exist yet
+            try {
+                // Create date objects from form inputs - FIX TIMEZONE ISSUE
+                $dateIni = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->dateIni_date . ' ' . $request->dateIni_time, config('app.timezone'));
+                $dateFin = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->dateFin_date . ' ' . $request->dateFin_time, config('app.timezone'));
+
+                Event::create([
+                    'title' => $tournament->name,
+                    'description' => 'Tournament',
+                    'start_date' => $dateIni,
+                    'end_date' => $dateFin,
+                ]);
+                \Log::info("Calendar event created for existing tournament: {$tournament->name}");
+            } catch (\Exception $e) {
+                \Log::error('Failed to create calendar event for existing tournament', [
+                    'tournament_id' => $tournament->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't throw error - championship creation should continue
+            }
+        }
+
         return $this->createChampionship($tournament, $request, $isTeam, $numFighters);
     }
 
@@ -600,6 +648,10 @@ class TreeController extends Controller
 
         try {
             $tournamentName = $tournament->name;
+
+            // DELETE ASSOCIATED CALENDAR EVENT FIRST
+            $this->deleteTournamentEvent($tournament);
+
             $this->cleanTournamentData($tournament->id);
             $tournament->delete();
 
@@ -624,34 +676,85 @@ class TreeController extends Controller
             $championshipName = $championship->name;
             $tournamentId = $championship->tournament_id;
 
-        // Clean championship data
-        DB::table('fight')->whereIn('fighters_group_id', function($query) use ($championship) {
-            $query->select('id')->from('fighters_groups')->where('championship_id', $championship->id);
-        })->delete();
+            // Clean championship data
+            DB::table('fight')->whereIn('fighters_group_id', function($query) use ($championship) {
+                $query->select('id')->from('fighters_groups')->where('championship_id', $championship->id);
+            })->delete();
 
-        DB::table('fighters_groups')->where('championship_id', $championship->id)->delete();
-        DB::table('fighters_group_competitor')->whereIn('fighters_group_id', function($query) use ($championship) {
-            $query->select('id')->from('fighters_groups')->where('championship_id', $championship->id);
-        })->delete();
-        DB::table('fighters_group_team')->whereIn('fighters_group_id', function($query) use ($championship) {
-            $query->select('id')->from('fighters_groups')->where('championship_id', $championship->id);
-        })->delete();
-        DB::table('competitor')->where('championship_id', $championship->id)->delete();
-        DB::table('team')->where('championship_id', $championship->id)->delete();
-        DB::table('championship_settings')->where('championship_id', $championship->id)->delete();
+            DB::table('fighters_groups')->where('championship_id', $championship->id)->delete();
+            DB::table('fighters_group_competitor')->whereIn('fighters_group_id', function($query) use ($championship) {
+                $query->select('id')->from('fighters_groups')->where('championship_id', $championship->id);
+            })->delete();
+            DB::table('fighters_group_team')->whereIn('fighters_group_id', function($query) use ($championship) {
+                $query->select('id')->from('fighters_groups')->where('championship_id', $championship->id);
+            })->delete();
+            DB::table('competitor')->where('championship_id', $championship->id)->delete();
+            DB::table('team')->where('championship_id', $championship->id)->delete();
+            DB::table('championship_settings')->where('championship_id', $championship->id)->delete();
 
-        $championship->delete();
+            $championship->delete();
 
-        // Check if tournament has any other championships
-        $remainingChampionships = Championship::where('tournament_id', $tournamentId)->count();
-        if ($remainingChampionships == 0) {
-            Tournament::where('id', $tournamentId)->delete();
-        }
+            // Check if tournament has any other championships
+            $remainingChampionships = Championship::where('tournament_id', $tournamentId)->count();
+            if ($remainingChampionships == 0) {
+                // If this was the last championship, delete the tournament and its event
+                $tournament = Tournament::find($tournamentId);
+                if ($tournament) {
+                    $this->deleteTournamentEvent($tournament);
+                    $tournament->delete();
+                }
+            }
 
             return back()->with('success', __('Championship deleted successfully!'));
         } catch (\Exception $e) {
             \Log::error('Error deleting championship', ['error' => $e->getMessage()]);
             return back()->withErrors([__('Error deleting championship') . ': ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Delete calendar event associated with a tournament
+     */
+    private function deleteTournamentEvent(Tournament $tournament)
+    {
+        try {
+            // Convert dates to Carbon instances if they are strings
+            $dateIni = $tournament->dateIni instanceof \Carbon\Carbon
+                ? $tournament->dateIni
+                : \Carbon\Carbon::parse($tournament->dateIni);
+
+            $dateFin = $tournament->dateFin instanceof \Carbon\Carbon
+                ? $tournament->dateFin
+                : \Carbon\Carbon::parse($tournament->dateFin);
+
+            $deleted = Event::where('title', $tournament->name)
+                        ->where('start_date', $dateIni)
+                        ->where('end_date', $dateFin)
+                        ->delete();
+
+            \Log::info("Deleted {$deleted} calendar events for tournament: {$tournament->name}");
+
+            if ($deleted === 0) {
+                \Log::warning("No calendar events found to delete for tournament: {$tournament->name}");
+
+                // Try a broader search if exact match fails - use the parsed dates
+                $alternativeDeleted = Event::where('title', $tournament->name)
+                                        ->whereDate('start_date', $dateIni->format('Y-m-d'))
+                                        ->delete();
+
+                \Log::info("Alternative deletion result: {$alternativeDeleted} events deleted");
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Error deleting calendar event for tournament', [
+                'tournament_id' => $tournament->id,
+                'tournament_name' => $tournament->name,
+                'dateIni_type' => gettype($tournament->dateIni),
+                'dateIni_value' => $tournament->dateIni,
+                'dateFin_type' => gettype($tournament->dateFin),
+                'dateFin_value' => $tournament->dateFin,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
