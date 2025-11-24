@@ -18,12 +18,22 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/blog/{slug}', [HomeController::class, 'showPost'])->name('blog.show');
 Route::get('/topic/{slug}', [HomeController::class, 'topic'])->name('blog.topic');
 
-// Tournaments routes
-Route::get('/tournaments', [TreeController::class, 'index'])->name('tournaments.index');
-Route::post('/tournaments', [TreeController::class, 'store'])->name('tournaments.store');
-Route::put('/tournaments/{championship}', [TreeController::class, 'update'])->name('tournaments.update');
-Route::post('/tournaments/{tournament}/delete', [TreeController::class, 'destroyTournament'])->name('tournaments.destroy');
-Route::post('/championships/{championship}/delete', [TreeController::class, 'destroyChampionship'])->name('championships.destroy');
+// Tournament participation routes (public viewing)
+Route::get('/tournaments/list', [TreeController::class, 'list'])->name('tournaments.list');
+Route::get('/tournaments/{championship}/view', [TreeController::class, 'show'])->name('tournaments.show');
+
+// Tournament management routes (trainers/admins only)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/tournaments', [TreeController::class, 'index'])->name('tournaments.index');
+    Route::post('/tournaments', [TreeController::class, 'store'])->name('tournaments.store');
+    Route::put('/tournaments/{championship}', [TreeController::class, 'update'])->name('tournaments.update');
+    Route::post('/tournaments/{tournament}/delete', [TreeController::class, 'destroyTournament'])->name('tournaments.destroy');
+    Route::post('/championships/{championship}/delete', [TreeController::class, 'destroyChampionship'])->name('championships.destroy');
+
+    // Tournament participation actions
+    Route::post('/tournaments/{championship}/join', [TreeController::class, 'join'])->name('tournaments.join');
+    Route::post('/tournaments/{championship}/leave', [TreeController::class, 'leave'])->name('tournaments.leave');
+});
 
 // Resource Routes
 Route::resource('players', PlayerController::class);

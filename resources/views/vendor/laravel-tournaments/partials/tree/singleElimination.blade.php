@@ -82,22 +82,22 @@ try {
         <div class="clearfix"></div>
         <div align="right">
             <button type="submit" class="btn btn-success" id="update">
-                Update Tree
+                {{ __('Update Tree') }}
             </button>
         </div>
     </form>
 @else
     <div class="alert alert-info">
         @if(!$hasValidTreeData)
-            No single elimination tree generated yet. Please generate the tournament tree first.
+            {{ __('No single elimination tree generated yet. Please generate the tournament tree first.') }}
 
             @if($championship->fightersGroups->count() == 0)
-                <br><small>No fighter groups found for this championship.</small>
+                <br><small>{{ __('No fighter groups found for this championship.') }}</small>
             @elseif(isset($singleEliminationTree) && $singleEliminationTree->count() == 0)
-                <br><small>No single elimination rounds found (only preliminary rounds may exist).</small>
+                <br><small>{{ __('No single elimination rounds found (only preliminary rounds may exist).') }}</small>
             @endif
         @else
-            Tournament tree was generated but no brackets could be displayed. This might be due to insufficient participants or a configuration issue.
+            {{ __('Tournament tree was generated but no brackets could be displayed. This might be due to insufficient participants or a configuration issue.') }}
         @endif
     </div>
 @endif

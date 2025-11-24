@@ -47,7 +47,7 @@ class RegisteredUserController extends Controller
             'last_name' => $request->last_name,
             'email' => $request->email,
             'username' => $username,
-            'password' => Hash::make($request->password),
+            'password' => Hash::make(value: $request->password),
         ]);
 
         $userRole = Role::where('slug', 'registered')->first();

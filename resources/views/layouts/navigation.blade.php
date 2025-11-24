@@ -5,7 +5,7 @@
             <div class="flex space-x-8">
                 <a href="{{ url('/') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('/') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Home') }}</a>
                 <a href="{{ url('/sports') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('matches') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Matches') }}</a>
-                <a href="{{ url('/tournaments') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('tournaments') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Tournaments') }}</a>
+                <a href="{{ route('tournaments.list') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('tournaments*') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Tournaments') }}</a>
                 <a href="{{ url('/calendar') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('calendar') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Calendar') }}</a>
                 <a href="{{ url('/gallery') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('gallery') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('Photo Gallery') }}</a>
                 <a href="{{ url('/about') }}" class="text-gray-700 hover:text-blue-600 font-medium {{ request()->is('about') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">{{ __('About Us') }}</a>

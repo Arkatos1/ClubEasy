@@ -1,0 +1,41 @@
+@startuml
+title Ziskání členství
+
+start
+:Uživatel navštíví stránku členství;
+
+if (Uživatel již má aktivní členství?) then (ano)
+  :Zobrazení stavu "Aktivní člen";
+  stop
+else (ne)
+  if (Uživatel má čekající platbu?) then (ano)
+    :Zobrazení stavu "Čeká na schválení";
+    stop
+  else (ne)
+    :Uživatel klikne "Stát se členem";
+    :Zobrazení QR kódu a platebních údajů;
+    :Uživatel zaplatí pomocí QR kódu;
+
+    if (Uživatel potvrdí odeslání platby?) then (ano)
+        :Nastavení stavu "Čeká na schválení";
+      :Odeslání emailu administrátorům o příchozí platbě;
+
+      if (Platba potvrzena administrátorem?) then (ano)
+        :Odeslání emailu o potvrzení platby;
+        :Získání přístupu k členské roli a funkcím;
+        :Zobrazení stavu "Aktivní člen";
+        stop
+      else (ne)
+        :Odeslání emailu o zamítnutí platby;
+        :Zrušení stavu "Čeká na schválení";
+        stop
+      endif
+    else (ne)
+      :Uživatel zrušil potvrzení platby;
+      :Návrat na členskou stránku;
+      stop
+    endif
+  endif
+endif
+
+@enduml
