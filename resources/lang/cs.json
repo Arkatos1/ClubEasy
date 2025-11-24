@@ -221,7 +221,7 @@
     "Tournament Management": "Správa turnajů",
     "Access Denied": "Přístup odepřen",
     "View Public Tournaments": "Zobrazit seznam turnajů",
-    "View Public": "Zobrazit veřejně",
+    "View Public": "Zobrazit veřejný profil",
     "View": "Zobrazit",
     "Are you sure you want to delete this tournament and all its championships?": "Jste si jisti, že chcete smazat tento turnaj a všechny jeho šampionáty?",
     "Are you sure you want to delete this championship?": "Jste si jisti, že chcete smazat tento šampionát?",
@@ -252,5 +252,15 @@
     "Competitor 1": "Bojovník 1",
     "Competitor 2": "Bojovník 2",
     "Area": "Aréna",
-    "TBD": "TBD"
+    "TBD": "TBD",
+    "Quarter-Finals": "Čtvrtfinále",
+    "Semi-Finals": "Semifinále",
+    "Final": "Finále",
+    "Grand Final": "Velké finále",
+    "Round of :num": "Kolo :num",
+    "Start Date & Time": "Datum a čas začátku",
+    "End Date & Time": "Datum a čas konce",
+    "Bracket": "Pavouk",
+    "Schedule": "Rozpis",
+    "Generate": "Generovat"
 }

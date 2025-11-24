@@ -212,7 +212,12 @@ class TreeController extends Controller
             'numFighters' => 'required|integer|min:2|max:128',
             'tree_type' => 'required|integer|in:1,2,3',
             'isTeam' => 'sometimes|boolean',
-            'tournament_id' => 'nullable|exists:tournament,id'
+            'tournament_id' => 'nullable|exists:tournament,id',
+            'tournament_name' => 'nullable|string|max:255',
+            'dateIni_date' => 'required_without:tournament_id|date',
+            'dateIni_time' => 'required_without:tournament_id|date_format:H:i',
+            'dateFin_date' => 'required_without:tournament_id|date',
+            'dateFin_time' => 'required_without:tournament_id|date_format:H:i',
         ]);
 
         // If tournament_id is provided, use existing tournament
@@ -302,21 +307,27 @@ class TreeController extends Controller
         // Clean existing data first
         $this->cleanChampionshipData();
 
-        // Create unique tournament name with Czech months
-        $tournamentType = $isTeam ? __('Team') : __('Individual');
-        $month = now()->translatedFormat('F');
-        $day = now()->format('j');
-        $year = now()->format('Y');
-        $time = now()->format('H:i');
+        // Create tournament name - use custom name or generate one
+        $tournamentName = $request->tournament_name;
+        if (!$tournamentName) {
+            $tournamentType = $isTeam ? __('Team') : __('Individual');
+            $month = now()->translatedFormat('F');
+            $day = now()->format('j');
+            $year = now()->format('Y');
+            $time = now()->format('H:i');
+            $tournamentName = "{$tournamentType} - {$day}. {$month} {$year} {$time}";
+        }
 
-        $tournamentName = "{$tournamentType} - {$day}. {$month} {$year} {$time}";
+        // Create date objects from form inputs
+        $dateIni = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->dateIni_date . ' ' . $request->dateIni_time);
+        $dateFin = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->dateFin_date . ' ' . $request->dateFin_time);
 
         // Create tournament
         $tournament = Tournament::create([
             'name' => $tournamentName,
             'slug' => Str::slug($tournamentName),
-            'dateIni' => now(),
-            'dateFin' => now()->addDays(3),
+            'dateIni' => $dateIni,
+            'dateFin' => $dateFin,
             'level_id' => 1,
             'type' => 1,
             'venue_id' => $this->getOrCreateVenue(),
