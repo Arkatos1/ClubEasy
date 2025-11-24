@@ -168,8 +168,8 @@ class TreeController extends Controller
 
                 if (!$placeholderUser) {
                     $placeholderUser = User::create([
-                        'first_name' => 'Placeholder',
-                        'last_name' => 'User' . $competitor->short_id,
+                        'first_name' => __('Available Spot'),
+                        'last_name' => '', // Empty last name
                         'email' => $placeholderEmail,
                         'username' => 'placeholder_user_' . $championship->id . '_' . $competitor->short_id,
                         'password' => bcrypt(Str::random(32)),
@@ -426,8 +426,8 @@ class TreeController extends Controller
 
             if (!$dummyUser) {
                 $dummyUser = User::create([
-                    'first_name' => 'Placeholder',
-                    'last_name' => 'User' . $i,
+                    'first_name' => __('Available Spot'),
+                    'last_name' => '', // Empty last name
                     'email' => $placeholderEmail,
                     'username' => 'placeholder_user_' . $championship->id . '_' . $i,
                     'password' => bcrypt(Str::random(32)),

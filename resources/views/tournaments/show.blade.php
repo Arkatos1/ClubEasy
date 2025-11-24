@@ -218,11 +218,15 @@
                                     </div>
                                     <div>
                                         @if($competitor->user_id)
-                                            <p class="font-medium text-gray-900">
-                                                {{ $competitor->user->name ?? __('Unknown Competitor') }}
-                                            </p>
-                                            @if($isRegistered && auth()->id() === $competitor->user_id)
-                                                <span class="text-xs text-green-600 font-medium">{{ __('You') }}</span>
+                                            @if(strpos($competitor->user->email ?? '', 'placeholder_') === 0 || $competitor->user->first_name == __('Available Spot'))
+                                                <p class="text-gray-500 italic">{{ __('Available Spot') }}</p>
+                                            @else
+                                                <p class="font-medium text-gray-900">
+                                                    {{ $competitor->user->name ?? __('Unknown Competitor') }}
+                                                </p>
+                                                @if($isRegistered && auth()->id() === $competitor->user_id)
+                                                    <span class="text-xs text-green-600 font-medium">{{ __('You') }}</span>
+                                                @endif
                                             @endif
                                         @else
                                             <p class="text-gray-500 italic">{{ __('Available Spot') }}</p>

@@ -381,7 +381,7 @@
                                                 <h4 class="text-lg font-medium">{{ $championship->name }}</h4>
                                                 <div class="flex gap-2">
                                                     <a href="{{ route('tournaments.show', $championship) }}"
-                                                       class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-1 px-3 rounded text-sm">
+                                                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-3 rounded text-sm">
                                                         {{ __('View') }}
                                                     </a>
                                                     <form action="{{ route('championships.destroy', $championship) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this championship?') }}')">
@@ -439,7 +439,11 @@
                                                     @foreach($championship->competitors as $competitor)
                                                         <div class="bg-gray-100 p-2 rounded text-sm">
                                                             @if($competitor->user_id)
-                                                                {{ $competitor->user->name ?? __('Unknown Competitor') }}
+                                                                @if(strpos($competitor->user->email ?? '', 'placeholder_') === 0 || $competitor->user->first_name == __('Available Spot'))
+                                                                    <span class="text-gray-500 italic">{{ __('Available Spot') }}</span>
+                                                                @else
+                                                                    {{ $competitor->user->name ?? __('Unknown Competitor') }}
+                                                                @endif
                                                             @else
                                                                 <span class="text-gray-500 italic">{{ __('Available Spot') }}</span>
                                                             @endif
