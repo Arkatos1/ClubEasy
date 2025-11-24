@@ -18,6 +18,10 @@
                             // Convert string dates to Carbon instances for formatting
                             $dateIni = \Carbon\Carbon::parse($championship->tournament->dateIni);
                             $dateFin = \Carbon\Carbon::parse($championship->tournament->dateFin);
+
+                            // Use Czech locale for month names
+                            $dateIni->locale('cs');
+                            $dateFin->locale('cs');
                         @endphp
                         {{ $dateIni->format('d.m.Y H:i') }} - {{ $dateFin->format('d.m.Y H:i') }}
                     </p>
@@ -85,10 +89,12 @@
                                             $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
                                         })
                                         ->count();
+                                    $totalSpots = $championship->competitors()->count();
+                                    $availableSpots = $totalSpots - $realParticipants;
                                 @endphp
-                                {{ $realParticipants }}
+                                {{ $realParticipants }} / {{ $totalSpots }}
                                 @if($championship->settings && $championship->settings->limitByEntity > 0)
-                                    / {{ $championship->settings->limitByEntity }}
+                                    ({{ __('Max') }}: {{ $championship->settings->limitByEntity }})
                                 @endif
                             </span>
                         </div>
@@ -127,7 +133,7 @@
                             </div>
                         @else
                             @if($hasActiveMembership)
-                                @if($championship->settings && $championship->settings->limitByEntity > 0 && $championship->competitors->count() >= $championship->settings->limitByEntity)
+                                @if($championship->settings && $championship->settings->limitByEntity > 0 && $realParticipants >= $championship->settings->limitByEntity)
                                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                                         <div class="flex items-center">
                                             <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -146,26 +152,20 @@
                                     </form>
                                     <p class="text-sm text-gray-600 mt-2 text-center">
                                         {{ __('Available spots') }}:
-                                        @if($championship->settings && $championship->settings->limitByEntity > 0)
-                                            @php
-                                                $availableSpots = $championship->competitors()
-                                                    ->whereHas('user', function($query) use ($championship) {
-                                                        $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
-                                                    })
-                                                    ->count();
-                                            @endphp
-                                            {{ $availableSpots }}
-                                        @else
-                                            @php
-                                                // For unlimited tournaments, show remaining placeholder spots
-                                                $availableSpots = $championship->competitors()
-                                                    ->whereHas('user', function($query) use ($championship) {
-                                                        $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
-                                                    })
-                                                    ->count();
-                                            @endphp
-                                            {{ $availableSpots }}
-                                        @endif
+                                        @php
+                                            $realParticipants = $championship->competitors()
+                                                ->whereDoesntHave('user', function($query) use ($championship) {
+                                                    $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                                                })
+                                                ->count();
+                                            $totalSpots = $championship->competitors()->count();
+                                            $availableSpots = $totalSpots - $realParticipants;
+
+                                            if($championship->settings && $championship->settings->limitByEntity > 0) {
+                                                $availableSpots = min($availableSpots, $championship->settings->limitByEntity - $realParticipants);
+                                            }
+                                        @endphp
+                                        {{ $availableSpots }}
                                     </p>
                                 @endif
                             @else
@@ -204,8 +204,9 @@
                                 })
                                 ->count();
                             $totalSpots = $championship->competitors()->count();
+                            $availableSpots = $totalSpots - $realParticipants;
                         @endphp
-                        ({{ $realParticipants }} {{ __('registered') }} / {{ $totalSpots }} {{ __('total') }})
+                        ({{ $realParticipants }} {{ __('registered') }} / {{ $availableSpots }} {{ __('available') }} / {{ $totalSpots }} {{ __('total') }})
                     </span>
                 </h3>
 
