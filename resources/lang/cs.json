@@ -262,5 +262,13 @@
     "End Date & Time": "Datum a čas konce",
     "Bracket": "Pavouk",
     "Schedule": "Rozpis",
-    "Generate": "Generovat"
+    "Generate": "Generovat",
+    "Enter tournament name": "Zadejte název turnaje",
+    "Leave empty to create a new tournament": "Ponechte prázdné pro vytvoření nového turnaje",
+    "No championships in this tournament yet.": "V tomto turnaji zatím nejsou žádné šampionáty.",
+    "Tournament Settings": "Nastavení Turnaje",
+    "Upcoming Tournaments": "Nadcházející turnaje",
+    "Past Tournaments": "Minulé turnaje",
+    "Completed": "Dokončen",
+    "Not Completed": "Nedokončen"
 }

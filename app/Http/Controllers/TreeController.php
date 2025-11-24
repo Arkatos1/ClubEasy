@@ -65,7 +65,7 @@ class TreeController extends Controller
             'championships.category',
             'championships.competitors.user',
             'championships.teams'
-        ])->where('dateFin', '>=', now())->latest()->get();
+        ])->latest()->get();
 
         $user = auth()->user();
         $hasActiveMembership = $user ? $user->hasActiveMembership() : false;
