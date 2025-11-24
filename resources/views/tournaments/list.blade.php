@@ -70,7 +70,15 @@
                                         <div class="flex justify-between text-sm">
                                             <span class="text-gray-500">{{ __('Participants') }}:</span>
                                             <span class="font-medium">
-                                                {{ $championship->competitors->whereNotNull('user_id')->count() }} / {{ $championship->competitors->count() }}
+                                                @php
+                                                    $realParticipants = $championship->competitors()
+                                                        ->whereDoesntHave('user', function($query) use ($championship) {
+                                                            $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                                                        })
+                                                        ->count();
+                                                    $totalSpots = $championship->competitors()->count();
+                                                @endphp
+                                                {{ $realParticipants }} / {{ $totalSpots }}
                                                 @if($championship->settings && $championship->settings->limitByEntity > 0)
                                                     ({{ __('Max') }}: {{ $championship->settings->limitByEntity }})
                                                 @endif

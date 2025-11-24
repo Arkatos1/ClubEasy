@@ -79,7 +79,14 @@
                         <div class="flex justify-between">
                             <span class="text-gray-600">{{ __('Participants') }}:</span>
                             <span class="font-medium">
-                                {{ $championship->competitors->count() }}
+                                @php
+                                    $realParticipants = $championship->competitors()
+                                        ->whereDoesntHave('user', function($query) use ($championship) {
+                                            $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                                        })
+                                        ->count();
+                                @endphp
+                                {{ $realParticipants }}
                                 @if($championship->settings && $championship->settings->limitByEntity > 0)
                                     / {{ $championship->settings->limitByEntity }}
                                 @endif
@@ -141,12 +148,23 @@
                                         {{ __('Available spots') }}:
                                         @if($championship->settings && $championship->settings->limitByEntity > 0)
                                             @php
-                                                $placeholderUser = \App\Models\User::where('email', 'placeholder@example.com')->first();
-                                                $availableSpots = $placeholderUser ? $championship->competitors()->where('user_id', $placeholderUser->id)->count() : 0;
+                                                $availableSpots = $championship->competitors()
+                                                    ->whereHas('user', function($query) use ($championship) {
+                                                        $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                                                    })
+                                                    ->count();
                                             @endphp
                                             {{ $availableSpots }}
                                         @else
-                                            {{ __('Unlimited') }}
+                                            @php
+                                                // For unlimited tournaments, show remaining placeholder spots
+                                                $availableSpots = $championship->competitors()
+                                                    ->whereHas('user', function($query) use ($championship) {
+                                                        $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                                                    })
+                                                    ->count();
+                                            @endphp
+                                            {{ $availableSpots }}
                                         @endif
                                     </p>
                                 @endif
@@ -175,11 +193,18 @@
                 </div>
             </div>
 
-            <!-- Participants List -->
-            <div class="mb-8">
+                <!-- Participants List header -->
                 <h3 class="text-xl font-semibold mb-4">{{ __('Participants') }}
                     <span class="text-sm text-gray-500 font-normal">
-                        ({{ $championship->competitors->whereNotNull('user_id')->count() }} {{ __('registered') }} / {{ $championship->competitors->count() }} {{ __('total') }})
+                        @php
+                            $realParticipants = $championship->competitors()
+                                ->whereDoesntHave('user', function($query) use ($championship) {
+                                    $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                                })
+                                ->count();
+                            $totalSpots = $championship->competitors()->count();
+                        @endphp
+                        ({{ $realParticipants }} {{ __('registered') }} / {{ $totalSpots }} {{ __('total') }})
                     </span>
                 </h3>
 

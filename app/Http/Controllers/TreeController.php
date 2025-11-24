@@ -93,10 +93,10 @@ class TreeController extends Controller
         }
 
         try {
-            // Find the first available placeholder (users with placeholder emails)
+            // Find the first available placeholder (users with placeholder emails for this championship)
             $placeholder = $championship->competitors()
-                ->whereHas('user', function($query) {
-                    $query->where('email', 'LIKE', 'placeholder%@example.com');
+                ->whereHas('user', function($query) use ($championship) {
+                    $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
                 })
                 ->orderBy('short_id')
                 ->first();
@@ -113,7 +113,9 @@ class TreeController extends Controller
             } else {
                 // No placeholders available, check if we can add a new competitor
                 $maxCompetitors = $championship->settings->limitByEntity ?? 0;
-                $currentCompetitors = $championship->competitors()->whereNotNull('user_id')->count();
+                $currentCompetitors = $championship->competitors()->whereDoesntHave('user', function($query) use ($championship) {
+                    $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                })->count();
 
                 if ($maxCompetitors > 0 && $currentCompetitors >= $maxCompetitors) {
                     return redirect()->back()->withErrors(['error' => __('Tournament is full')]);
@@ -158,16 +160,23 @@ class TreeController extends Controller
             $competitor = $championship->competitors()->where('user_id', $user->id)->first();
 
             if ($competitor) {
-                // Create a new placeholder user for this spot
-                $placeholderUser = User::create([
-                    'first_name' => 'Placeholder',
-                    'last_name' => 'User' . $competitor->short_id,
-                    'email' => 'placeholder' . $competitor->short_id . '_' . Str::random(6) . '@example.com',
-                    'username' => 'placeholder_user' . $competitor->short_id . '_' . Str::random(6),
-                    'password' => bcrypt(Str::random(32)),
-                ]);
+                // Create a new placeholder user with the correct email format
+                $placeholderEmail = "placeholder_{$championship->id}_{$competitor->short_id}@example.com";
 
-                // Replace with placeholder user instead of setting to null
+                // Check if placeholder user already exists
+                $placeholderUser = User::where('email', $placeholderEmail)->first();
+
+                if (!$placeholderUser) {
+                    $placeholderUser = User::create([
+                        'first_name' => 'Placeholder',
+                        'last_name' => 'User' . $competitor->short_id,
+                        'email' => $placeholderEmail,
+                        'username' => 'placeholder_user_' . $championship->id . '_' . $competitor->short_id,
+                        'password' => bcrypt(Str::random(32)),
+                    ]);
+                }
+
+                // Replace with placeholder user
                 $competitor->update([
                     'user_id' => $placeholderUser->id,
                     'confirmed' => 0,
@@ -409,28 +418,25 @@ class TreeController extends Controller
 
         $competitors = [];
         $now = now();
-        $dummyUsers = [];
 
-        // Create dummy users
+        // Create multiple placeholder users to avoid unique constraint violations
         for ($i = 1; $i <= $numFighters; $i++) {
-            $dummyUser = User::where('email', 'placeholder' . $i . '@example.com')->first();
+            $placeholderEmail = "placeholder_{$championship->id}_{$i}@example.com";
+            $dummyUser = User::where('email', $placeholderEmail)->first();
+
             if (!$dummyUser) {
                 $dummyUser = User::create([
                     'first_name' => 'Placeholder',
                     'last_name' => 'User' . $i,
-                    'email' => 'placeholder' . $i . '@example.com',
-                    'username' => 'placeholder_user' . $i,
+                    'email' => $placeholderEmail,
+                    'username' => 'placeholder_user_' . $championship->id . '_' . $i,
                     'password' => bcrypt(Str::random(32)),
                 ]);
             }
-            $dummyUsers[] = $dummyUser;
-        }
 
-        // Create competitors
-        for ($i = 1; $i <= $numFighters; $i++) {
             $competitors[] = [
                 'championship_id' => $championship->id,
-                'user_id' => $dummyUsers[$i-1]->id,
+                'user_id' => $dummyUser->id,
                 'short_id' => $i,
                 'confirmed' => 0,
                 'created_at' => $now,
