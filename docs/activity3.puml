@@ -1,0 +1,32 @@
+@startuml
+title Přihlášení do soutěže
+
+start
+:Uživatel klikne "Přihlásit se do turnaje";
+
+if (Uživatel přihlášen v aplikaci?) then (ne)
+  :Přesměrování na přihlášení;
+  stop
+else (ano)
+  if (Uživatel má aktivní členství?) then (ne)
+    :Zobrazení výzvy k získání členství;
+    stop
+  else (ano)
+    if (Uživatel již je přihlášen v tomto turnaji?) then (ano)
+      :Zobrazení stavu "Již jste přihlášen";
+      stop
+    else (ne)
+      if (Turnaj je již plný?) then (ano)
+        :Zobrazení stavu "Turnaj je plný";
+        stop
+      else (ne)
+        :Přiřazení volného místa uživateli;
+        :Aktualizace seznamu účastníků;
+        :Zobrazení stavu "Úspěšně přihlášen";
+        stop
+      endif
+    endif
+  endif
+endif
+
+@enduml
