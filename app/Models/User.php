@@ -209,4 +209,14 @@ class User extends Authenticatable
         };
     }
 
+    public function scopeExcludePlaceholders($query)
+    {
+        return $query->where('email', 'NOT LIKE', 'placeholder_%@example.com');
+    }
+
+    public function scopeOnlyPlaceholders($query)
+    {
+        return $query->where('email', 'LIKE', 'placeholder_%@example.com');
+    }
+
 }

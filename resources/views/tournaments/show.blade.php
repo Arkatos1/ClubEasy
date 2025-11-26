@@ -86,7 +86,7 @@
                                 @php
                                     $realParticipants = $championship->competitors()
                                         ->whereDoesntHave('user', function($query) use ($championship) {
-                                            $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                                            $query->where('email', 'LIKE', 'placeholder_%@example.com');
                                         })
                                         ->count();
                                     $totalSpots = $championship->competitors()->count();
@@ -155,7 +155,7 @@
                                         @php
                                             $realParticipants = $championship->competitors()
                                                 ->whereDoesntHave('user', function($query) use ($championship) {
-                                                    $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                                                    $query->where('email', 'LIKE', 'placeholder_%@example.com');
                                                 })
                                                 ->count();
                                             $totalSpots = $championship->competitors()->count();
@@ -200,7 +200,7 @@
                         @php
                             $realParticipants = $championship->competitors()
                                 ->whereDoesntHave('user', function($query) use ($championship) {
-                                    $query->where('email', 'LIKE', "placeholder_{$championship->id}_%@example.com");
+                                    $query->where('email', 'LIKE', 'placeholder_%@example.com');
                                 })
                                 ->count();
                             $totalSpots = $championship->competitors()->count();

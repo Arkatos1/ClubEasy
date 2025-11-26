@@ -116,6 +116,10 @@
                                 </thead>
                                 <tbody id="users_table">
                                     @foreach($users as $user)
+                                        {{-- Skip placeholder users --}}
+                                        @if(strpos($user->email ?? '', 'placeholder_') === 0)
+                                            @continue
+                                        @endif
                                         <tr>
                                             <td>{{$user->id}}</td>
                                             <td>{{$user->name}}</td>
