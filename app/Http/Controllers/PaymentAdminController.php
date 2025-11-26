@@ -91,22 +91,10 @@ class PaymentAdminController extends Controller
             // Send confirmation email to user
             $user->notify(new PaymentVerifiedNotification());
 
-            Log::info("Payment verified by admin", [
-                'admin_id' => auth()->id(),
-                'user_id' => $user->id,
-                'membership_id' => $membership->id,
-                'reference' => $membership->payment_reference
-            ]);
-
             return redirect()->route('administration.payments.pending')
                 ->with('success', __('Payment verified and membership activated successfully.'));
 
         } catch (\Exception $e) {
-            Log::error("Payment verification failed", [
-                'membership_id' => $membership->id,
-                'error' => $e->getMessage()
-            ]);
-
             return redirect()->route('administration.payments.pending')
                 ->with('error', __('Payment verification failed: ') . $e->getMessage());
         }

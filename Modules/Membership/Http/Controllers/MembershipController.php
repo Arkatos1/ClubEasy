@@ -184,7 +184,7 @@ class MembershipController extends Controller
                 'amount' => 500.00,
                 'currency' => 'CZK',
                 'payment_submitted_at' => now(),
-                'transaction_id' => $request->transaction_id, // Store optional transaction ID
+                'transaction_id' => $request->transaction_id,
                 'expires_at' => now()->addYear(),
             ]);
 
@@ -200,22 +200,10 @@ class MembershipController extends Controller
             // Notify user
             $user->notify(new PaymentConfirmationPendingNotification($user, $paymentReference));
 
-            Log::info("Payment confirmation submitted directly from modal", [
-                'user_id' => $user->id,
-                'user_email' => $user->email,
-                'reference' => $paymentReference,
-                'transaction_id' => $request->transaction_id
-            ]);
-
             return redirect()->route('membership.index')
                 ->with('success', __('Děkujeme! Vaše platba byla nahlášena a čeká na schválení. O aktivaci členství vás budeme informovat do 1-2 pracovních dnů.'));
 
         } catch (\Exception $e) {
-            Log::error("Failed to process payment confirmation", [
-                'user_id' => $user->id,
-                'error' => $e->getMessage()
-            ]);
-
             return redirect()->route('membership.index')
                 ->with('error', __('Nastala chyba při odesílání potvrzení. Zkuste to prosím znovu.'));
         }

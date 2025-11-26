@@ -97,7 +97,12 @@
                         <div class="table-responsive users-table">
                             <table class="table table-striped table-sm data-table">
                                 <caption id="user_count">
-                                    {!! trans_choice('laravelusers::laravelusers.users-table.caption', 1, ['userscount' => $users->count()]) !!}
+                                    @php
+                                        $realUsersCount = $users->filter(function($user) {
+                                            return strpos($user->email ?? '', 'placeholder_') !== 0;
+                                        })->count();
+                                    @endphp
+                                    {!! trans_choice('laravelusers::laravelusers.users-table.caption', $realUsersCount, ['userscount' => $realUsersCount]) !!}
                                 </caption>
                                 <thead class="thead">
                                     <tr>
