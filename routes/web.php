@@ -1,9 +1,10 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TreeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UsersManagementController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CalendarController;
@@ -119,12 +120,12 @@ Route::middleware(['auth', 'verified', 'role:administrator'])->prefix('system')-
 
 // Laravel Users Management
 Route::get('/users', function () {
-    return app()->make(\jeremykenedy\LaravelUsers\App\Http\Controllers\UsersManagementController::class)->index();
+    return app()->make(\App\Http\Controllers\UsersManagementController::class)->index();
 })->name('users')->middleware(['auth', 'verified', 'role:administrator']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:administrator'])->group(function () {
-        Route::resource('users', \jeremykenedy\LaravelUsers\App\Http\Controllers\UsersManagementController::class);
+        Route::resource('users', \App\Http\Controllers\UsersManagementController::class);
     });
 });
 

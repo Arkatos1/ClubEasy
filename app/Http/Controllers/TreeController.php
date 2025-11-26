@@ -94,7 +94,7 @@ class TreeController extends Controller
         }
 
         try {
-            // Find ANY placeholder (they're all reusable) - Updated logic
+            // Find and reuse placeholder
             $placeholder = $championship->competitors()
                 ->whereHas('user', function($query) {
                     $query->where('email', 'LIKE', 'placeholder_%@example.com');
@@ -108,7 +108,6 @@ class TreeController extends Controller
                     'confirmed' => 1,
                 ]);
 
-                \Log::info("User {$user->id} replaced placeholder {$placeholder->id} in championship {$championship->id}");
                 return redirect()->back()->with('success', __('Successfully joined tournament'));
             } else {
                 // No placeholders available, check if we can add a new competitor
@@ -130,16 +129,10 @@ class TreeController extends Controller
                     'confirmed' => 1,
                 ]);
 
-                \Log::info("User {$user->id} added as new competitor in championship {$championship->id}");
                 return redirect()->back()->with('success', __('Successfully joined tournament'));
             }
 
         } catch (\Exception $e) {
-            \Log::error('Error joining tournament', [
-                'user_id' => $user->id,
-                'championship_id' => $championship->id,
-                'error' => $e->getMessage()
-            ]);
             return redirect()->back()->withErrors(['error' => __('Error joining tournament') . ': ' . $e->getMessage()]);
         }
     }

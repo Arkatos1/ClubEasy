@@ -78,16 +78,44 @@
                                     </div>
                                 </div>
                             </li>
-                            @if ($user->name)
+                            @if ($user->first_name)
                                 <li class="list-group-item">
                                     <div class="row">
                                         <div class="col-4 col-sm-3">
                                             <strong>
-                                                {!! trans('laravelusers::laravelusers.show-user.name') !!}
+                                                Křestní jméno
                                             </strong>
                                         </div>
                                         <div class="col-8 col-sm-9">
-                                            {{ $user->name }}
+                                            {{ $user->first_name }}
+                                        </div>
+                                    </div>
+                                </li>
+                            @endif
+                            @if ($user->last_name)
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-4 col-sm-3">
+                                            <strong>
+                                                Příjmení
+                                            </strong>
+                                        </div>
+                                        <div class="col-8 col-sm-9">
+                                            {{ $user->last_name }}
+                                        </div>
+                                    </div>
+                                </li>
+                            @endif
+                            @if ($user->username)
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-4 col-sm-3">
+                                            <strong>
+                                                Uživatelské jméno
+                                            </strong>
+                                        </div>
+                                        <div class="col-8 col-sm-9">
+                                            {{ $user->username }}
                                         </div>
                                     </div>
                                 </li>

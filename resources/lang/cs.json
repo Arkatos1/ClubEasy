@@ -273,5 +273,8 @@
     "Completed": "Dokončen",
     "Not Completed": "Nedokončen",
     "Expires:": "Vyprší:",
-    "available": "volných míst"
+    "available": "volných míst",
+    "Payment rejected and user notified.": "Členství odmítnuto a uživatel byl upozorněn.",
+    "After confirmation, administrators will verify your payment within 1-2 business days": "Potvrzení platby ze strany klubu může trvat 1 až 2 dny.",
+    "Confirm Payment": "Potvrdit platbu"
 }

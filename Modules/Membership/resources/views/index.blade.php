@@ -134,7 +134,6 @@
                         @if(isset($qrCode) && $qrCode)
                             <div class="text-center">
                                 {!! $qrCode !!}
-                                <p class="text-xs text-gray-500 mt-2">{{ __('Scan to pay') }}</p>
                             </div>
                         @else
                             <div class="text-center p-4">

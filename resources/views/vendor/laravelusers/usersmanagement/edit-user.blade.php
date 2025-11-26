@@ -50,30 +50,51 @@
                         <form method="POST" action="{{ route('users.update', $user->id) }}" role="form" class="needs-validation">
                             @csrf
                             @method('PUT')
-                            <div class="form-group has-feedback row {{ $errors->has('name') ? ' has-error ' : '' }}">
-                                @if(config('laravelusers.fontAwesomeEnabled'))
-                                    <label for="name" class="col-md-3 control-label">{{ trans('laravelusers::forms.create_user_label_username') }}</label>
-                                @endif
+
+                            <!-- First Name Field -->
+                            <div class="form-group has-feedback row {{ $errors->has('first_name') ? ' has-error ' : '' }}">
+                                <label for="first_name" class="col-md-3 control-label">Křestní jméno</label>
                                 <div class="col-md-9">
                                     <div class="input-group">
-                                        <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $user->name) }}" placeholder="{{ trans('laravelusers::forms.create_user_ph_username') }}">
+                                        <input type="text" name="first_name" id="first_name" class="form-control" value="{{ old('first_name', $user->first_name) }}" placeholder="First Name" required>
                                         <div class="input-group-append">
-                                            <label class="input-group-text" for="name">
+                                            <label class="input-group-text" for="first_name">
                                                 @if(config('laravelusers.fontAwesomeEnabled'))
-                                                    <i class="fa fa-fw {{ trans('laravelusers::forms.create_user_icon_username') }}" aria-hidden="true"></i>
-                                                @else
-                                                    {{ trans('laravelusers::forms.create_user_label_username') }}
+                                                    <i class="fa fa-fw fa-user" aria-hidden="true"></i>
                                                 @endif
                                             </label>
                                         </div>
                                     </div>
-                                    @if ($errors->has('name'))
+                                    @if ($errors->has('first_name'))
                                         <span class="help-block">
-                                            <strong>{{ $errors->first('name') }}</strong>
+                                            <strong>{{ $errors->first('first_name') }}</strong>
                                         </span>
                                     @endif
                                 </div>
                             </div>
+
+                            <!-- Last Name Field -->
+                            <div class="form-group has-feedback row {{ $errors->has('last_name') ? ' has-error ' : '' }}">
+                                <label for="last_name" class="col-md-3 control-label">Příjmení</label>
+                                <div class="col-md-9">
+                                    <div class="input-group">
+                                        <input type="text" name="last_name" id="last_name" class="form-control" value="{{ old('last_name', $user->last_name) }}" placeholder="Last Name" required>
+                                        <div class="input-group-append">
+                                            <label class="input-group-text" for="last_name">
+                                                @if(config('laravelusers.fontAwesomeEnabled'))
+                                                    <i class="fa fa-fw fa-user" aria-hidden="true"></i>
+                                                @endif
+                                            </label>
+                                        </div>
+                                    </div>
+                                    @if ($errors->has('last_name'))
+                                        <span class="help-block">
+                                            <strong>{{ $errors->first('last_name') }}</strong>
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+
                             <div class="form-group has-feedback row {{ $errors->has('email') ? ' has-error ' : '' }}">
                                 @if(config('laravelusers.fontAwesomeEnabled'))
                                     <label for="email" class="col-md-3 control-label">{{ trans('laravelusers::forms.create_user_label_email') }}</label>

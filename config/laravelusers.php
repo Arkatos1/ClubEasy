@@ -8,6 +8,8 @@ return [
     |--------------------------------------------------------------------------
     */
 
+    'controller' => 'App\Http\Controllers\UsersManagementController',
+
     // The parent blade file
     'laravelUsersBladeExtended'     => 'laravelusers::layouts.hybrid-app',
 
