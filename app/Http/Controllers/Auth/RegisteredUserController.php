@@ -38,7 +38,6 @@ class RegisteredUserController extends Controller
             'gdpr_consent' => ['required', 'accepted'],
         ]);
 
-        // Generate unique username
         $baseUsername = $request->first_name . ' ' . $request->last_name;
         $username = $this->generateUniqueUsername($baseUsername);
 
