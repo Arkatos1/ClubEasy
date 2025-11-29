@@ -129,10 +129,20 @@
                                         <select class="custom-select form-control" name="role[]" id="role" multiple>
                                             @if ($roles)
                                                 @foreach($roles as $role)
+                                                    @php
+                                                        $roleName = $role->name;
+                                                        $translatedRole = match($roleName) {
+                                                            'User' => 'Uživatel',
+                                                            'Admin' => 'Administrátor',
+                                                            'Trainer' => 'Trenér',
+                                                            'Member' => 'Člen',
+                                                            default => $roleName
+                                                        };
+                                                    @endphp
                                                     @if ($currentRole)
-                                                        <option value="{{ $role->id }}" {{ in_array($role->id, $currentRole) ? 'selected="selected"' : '' }}>{{ $role->name }}</option>
+                                                        <option value="{{ $role->id }}" {{ in_array($role->id, $currentRole) ? 'selected="selected"' : '' }}>{{ $translatedRole }}</option>
                                                     @else
-                                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                                        <option value="{{ $role->id }}">{{ $translatedRole }}</option>
                                                     @endif
                                                 @endforeach
                                             @endif

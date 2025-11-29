@@ -64,7 +64,8 @@ class MembershipController extends Controller
             'qrData' => $qrPlatbaData,
             'isValidFormat' => $isValidFormat,
             'hasActiveMembership' => $user->hasActiveMembership(),
-            'hasPendingMembership' => $user->hasPendingMembership()
+            'hasPendingMembership' => $user->hasPendingMembership(),
+            'expiresAt' => now()->endOfYear()
         ]);
     }
 

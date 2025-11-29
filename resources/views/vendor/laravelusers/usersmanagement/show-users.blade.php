@@ -151,16 +151,31 @@
                                             @if(config('laravelusers.rolesEnabled'))
                                                 <td class="hidden-sm hidden-xs">
                                                     @foreach ($user->roles as $user_role)
+                                                        @php
+                                                            $roleName = $user_role->name;
+                                                            $translatedRole = match($roleName) {
+                                                                'User' => 'Uživatel',
+                                                                'Admin' => 'Administrátor',
+                                                                'Trainer' => 'Trenér',
+                                                                'Member' => 'Člen',
+                                                                default => $roleName
+                                                            };
+                                                        @endphp
+
                                                         @if ($user_role->name == 'User')
                                                             @php $badgeClass = 'primary' @endphp
                                                         @elseif ($user_role->name == 'Admin')
                                                             @php $badgeClass = 'warning' @endphp
                                                         @elseif ($user_role->name == 'Unverified')
                                                             @php $badgeClass = 'danger' @endphp
+                                                        @elseif ($user_role->name == 'Trainer')
+                                                            @php $badgeClass = 'info' @endphp
+                                                        @elseif ($user_role->name == 'Member')
+                                                            @php $badgeClass = 'success' @endphp
                                                         @else
                                                             @php $badgeClass = 'dark' @endphp
                                                         @endif
-                                                        <span class="badge badge-{{$badgeClass}}">{{ $user_role->name }}</span>
+                                                        <span class="badge badge-{{$badgeClass}}">{{ $translatedRole }}</span>
                                                     @endforeach
                                                 </td>
                                             @endif

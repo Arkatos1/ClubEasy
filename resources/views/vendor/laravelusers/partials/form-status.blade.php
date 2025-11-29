@@ -12,7 +12,7 @@
     <div class="alert alert-success alert-dismissable">
         <a aria-label="close" class="close" data-dismiss="alert" href="#">&times;</a>
         <h4>
-            <i aria-hidden="true" class="icon fa fa-check fa-fw"></i> Success
+            <i aria-hidden="true" class="icon fa fa-check fa-fw"></i> {{ __('Úspěch') }}
         </h4>{{ session('success') }}
     </div>
 @endif
@@ -22,7 +22,7 @@
         <a aria-label="close" class="close" data-dismiss="alert" href="#">&times;</a>
         <h4 class="alert-heading">
             <i aria-hidden="true" class="fas fa-exclamation-triangle fa-fw"></i>
-            Error
+            {{ __('Error') }}
         </h4>
         <hr>
         <p class="mb-0">
@@ -37,7 +37,7 @@
         <h4 class="alert-heading text-danger">
             <i aria-hidden="true" class="fas fa-exclamation-triangle fa-fw"></i>
             <strong>
-                Errors
+                {{ __('Chyby') }}
             </strong>
         </h4>
         <ul class="list-group list-group-flush">

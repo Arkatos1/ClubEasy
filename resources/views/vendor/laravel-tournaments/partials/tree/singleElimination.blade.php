@@ -32,6 +32,37 @@ try {
     $noRounds = 0;
     \Log::error('Tree display error: ' . $e->getMessage());
 }
+
+// Překlad názvů kol
+$roundTranslations = [
+    'Quarter-Finals' => 'Čtvrt-finále',
+    'Semi-Finals' => 'Semi-finále',
+    'Final' => 'Finále',
+    'Grand Final' => 'Velké finále',
+    'Preliminary Round' => 'Předkolo',
+    'Round 1' => '1. kolo',
+    'Round 2' => '2. kolo',
+    'Round 3' => '3. kolo',
+    'Round 4' => '4. kolo',
+    'Round 5' => '5. kolo',
+    'Round 6' => '6. kolo'
+];
+
+function translateRoundTitle($title, $translations) {
+    if (isset($translations[$title])) {
+        return $translations[$title];
+    }
+
+    if (str_starts_with($title, 'Round of')) {
+        $number = str_replace('Round of ', '', $title);
+        return "Kolo $number";
+    }
+
+    return $title;
+}
+
+// Zjistit, zda má uživatel oprávnění spravovat turnaje
+$canManage = auth()->check() && (auth()->user()->hasRole('administrator') || auth()->user()->hasRole('trainer'));
 ?>
 
 @if ($hasValidTreeData && !empty($brackets))
@@ -44,9 +75,30 @@ try {
         <input type="hidden" name="_method" value="PUT">
         <input type="hidden" id="activeTreeTab" name="activeTreeTab" value="{{ $championship->id }}"/>
 
-        @if(method_exists($treeGen, 'printRoundTitles'))
-            {!! $treeGen->printRoundTitles() !!}
-        @endif
+        <!-- Vlastní implementace printRoundTitles s překladem -->
+        <div id="round-titles-wrapper">
+            @php
+                $roundWidth = 150;
+                $roundSpacing = 200;
+                $leftPosition = 0;
+            @endphp
+
+            @for ($i = 1; $i <= $noRounds; $i++)
+                @php
+                    $roundTitle = "Round $i";
+                    if ($i == $noRounds - 2 && $noRounds >= 3) $roundTitle = 'Quarter-Finals';
+                    if ($i == $noRounds - 1 && $noRounds >= 2) $roundTitle = 'Semi-Finals';
+                    if ($i == $noRounds) $roundTitle = 'Final';
+                    if ($i == $noRounds && $noRounds >= 4) $roundTitle = 'Grand Final';
+
+                    $translatedTitle = translateRoundTitle($roundTitle, $roundTranslations);
+                @endphp
+                <div class="round-title" style="left: {{ $leftPosition }}px;">
+                    {{ $translatedTitle }}
+                </div>
+                @php $leftPosition += $roundSpacing; @endphp
+            @endfor
+        </div>
 
         <div id="brackets-wrapper" style="padding-bottom: {{ max(100, ($championship->groupsByRound(1)->count() / 2 * 205)) }}px">
             @foreach ($brackets as $roundNumber => $round)
@@ -80,11 +132,15 @@ try {
         </div>
 
         <div class="clearfix"></div>
+
+        <!-- Tlačítko Update Tree - pouze pro administrátory a trenéry -->
+        @if($canManage)
         <div align="right">
             <button type="submit" class="btn btn-success" id="update">
                 {{ __('Update Tree') }}
             </button>
         </div>
+        @endif
     </form>
 @else
     <div class="alert alert-info">

@@ -186,16 +186,31 @@
                                         </div>
                                         <div class="col-8 col-sm-9">
                                             @foreach ($user->roles as $user_role)
+                                                @php
+                                                    $roleName = $user_role->name;
+                                                    $translatedRole = match($roleName) {
+                                                        'User' => 'Uživatel',
+                                                        'Admin' => 'Administrátor',
+                                                        'Trainer' => 'Trenér',
+                                                        'Member' => 'Člen',
+                                                        default => $roleName
+                                                    };
+                                                @endphp
+
                                                 @if ($user_role->name == 'User')
                                                     @php $labelClass = 'primary' @endphp
                                                 @elseif ($user_role->name == 'Admin')
                                                     @php $labelClass = 'warning' @endphp
                                                 @elseif ($user_role->name == 'Unverified')
                                                     @php $labelClass = 'danger' @endphp
+                                                @elseif ($user_role->name == 'Trainer')
+                                                    @php $labelClass = 'info' @endphp
+                                                @elseif ($user_role->name == 'Member')
+                                                    @php $labelClass = 'success' @endphp
                                                 @else
-                                                    @php $labelClass = 'default' @endphp
+                                                    @php $labelClass = 'dark' @endphp
                                                 @endif
-                                                <span class="badge badge-{{$labelClass}}">{{ $user_role->name }}</span>
+                                                <span class="badge badge-{{$labelClass}}">{{ $translatedRole }}</span>
                                             @endforeach
                                         </div>
                                     </div>

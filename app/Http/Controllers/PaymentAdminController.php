@@ -127,8 +127,13 @@ class PaymentAdminController extends Controller
                 'reason' => $request->reason
             ]);
 
+            if ($membership->status === 'cancelled') {
+                return redirect()->route('administration.payments.pending')
+                    ->with('success', __('Členství bylo úspěšně zrušeno.'));
+            }
+
             return redirect()->route('administration.payments.pending')
-                ->with('success', __('Payment rejected and user notified.'));
+                ->with('success', __('Platba zamítnuta a uživatel byl informován.'));
 
         } catch (\Exception $e) {
             Log::error("Payment rejection failed", [
@@ -137,7 +142,7 @@ class PaymentAdminController extends Controller
             ]);
 
             return redirect()->route('administration.payments.pending')
-                ->with('error', __('Payment rejection failed: ') . $e->getMessage());
+                ->with('error', __('Zamítnutí platby selhalo: ') . $e->getMessage());
         }
     }
 }

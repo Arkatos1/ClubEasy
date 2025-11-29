@@ -153,6 +153,7 @@
                     <p class="text-xs text-gray-600">{{ __('Account') }}: <span class="font-mono select-all">{{ $account ?? 'CZ58 5500 0000 0012 6509 8001' }}</span></p>
                     <p class="text-xs text-gray-600">{{ __('Bank') }}: <span class="font-mono">{{ $bank ?? 'Airbank' }}</span></p>
                     <p class="text-xs text-gray-600 font-mono">{{ __('Variable Symbol') }}: {{ $paymentReference ?? 'N/A' }}</p>
+                    <p class="text-xs text-gray-600 font-mono">{{ __('Membership valid until:') }} {{ $expiresAt->format('d.m.Y') }}</p>
                 </div>
 
                 <!-- Direct Confirmation Form -->
